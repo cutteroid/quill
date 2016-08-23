@@ -12,6 +12,9 @@ import Underline from './formats/underline';
 
 import Toolbar from './modules/toolbar';
 
+import Images from './modules/images';
+import ObjectImage from './formats/objectimage';
+
 import SnowTheme from './themes/snow';
 
 Quill.register({
@@ -28,6 +31,7 @@ Quill.register({
   'formats/list/item': ListItem,
 
   'modules/toolbar': Toolbar,
+  'modules/images': Images,
 
   'themes/snow': SnowTheme
 

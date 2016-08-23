@@ -75,6 +75,7 @@ class Quill {
     this.keyboard = this.theme.addModule('keyboard');
     this.clipboard = this.theme.addModule('clipboard');
     this.history = this.theme.addModule('history');
+    this.images = this.theme.addModule('images');
     this.theme.init();
     this.pasteHTML(`<div class='editable' style="white-space: normal;">${html}<p><br></p></div>`);
     this.history.clear();
@@ -296,6 +297,17 @@ class Quill {
       this.setSelection(range, Emitter.sources.SILENT);
     }
     return change;
+  }
+
+  fullscreenMode() {
+    var body = this.root.ownerDocument.body;
+
+    if (body.classList.contains('fullscreenEditor')) {
+      body.classList.remove('fullscreenEditor');
+    }
+    else {
+      body.classList.add('fullscreenEditor');
+    }
   }
 }
 Quill.DEFAULTS = {

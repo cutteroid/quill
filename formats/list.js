@@ -45,7 +45,7 @@ class List extends Container {
   static create(value) {
     if (value === 'ordered') {
       value = 'OL';
-    } else if (value === 'bullet') {
+    } else if (value === 'unordered') {
       value = 'UL';
     }
     return super.create(value);
@@ -53,7 +53,7 @@ class List extends Container {
 
   static formats(domNode) {
     if (domNode.tagName === 'OL') return 'ordered';
-    if (domNode.tagName === 'UL') return 'bullet';
+    if (domNode.tagName === 'UL') return 'unordered';
     return undefined;
   }
 

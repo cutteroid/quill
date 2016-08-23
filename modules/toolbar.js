@@ -111,6 +111,8 @@ class Toolbar extends Module {
   }
 
   update(range) {
+    let images = this.quill.images;
+    let body = this.quill.root.ownerDocument.body;
     let formats = range == null ? {} : this.quill.getFormat(range);
     this.controls.forEach(function(pair) {
       let [format, input] = pair;
@@ -140,7 +142,6 @@ class Toolbar extends Module {
           // both being null should match (default values)
           // '1' should match with 1 (headers)
           let type = input.getAttribute('type');
-          console.debug(formats[format],  type, formats[format] == type);
           let active = formats[format] == type || (formats[format] == null && !type)
           input.classList.toggle('active', active);
         } else {
@@ -238,12 +239,6 @@ Toolbar.DEFAULTS = {
       }
       this.quill.format('direction', value, Quill.sources.USER);
     },
-    link: function(value) {
-      if (value === true) {
-        value = prompt('Enter link URL:');
-      }
-      this.quill.format('link', value, Quill.sources.USER);
-    },
     indent: function(value) {
       let range = this.quill.getSelection();
       let formats = this.quill.getFormat(range);
@@ -253,6 +248,18 @@ Toolbar.DEFAULTS = {
         if (formats.direction === 'rtl') modifier *= -1;
         this.quill.format('indent', indent + modifier, Quill.sources.USER);
       }
+    },
+    link: function(value, evt) {
+      // zEditor.Entity.hidePopups(this.quill.root.parentNode);
+      this.quill.entities.openLinkDialog(evt);
+    },
+    image: function(value, evt) {
+      // zEditor.Entity.hidePopups(this.quill.root.parentNode);
+      console.debug(this.quill);
+      this.quill.images.openImagePanel(evt);
+    },
+    fullscreen: function(value, evt) {
+      this.quill.fullscreenMode();
     }
   }
 }
