@@ -11,7 +11,6 @@ import Theme from './theme';
 
 let debug = logger('quill');
 
-
 class Quill {
 
 
@@ -72,10 +71,11 @@ class Quill {
     this.editor = new Editor(this.scroll, this.emitter);
     this.selection = new Selection(this.scroll, this.emitter);
     this.theme = new options.theme(this, options);
+    this.images = this.theme.addModule('images');
+    this.entities = this.theme.addModule('entities');
     this.keyboard = this.theme.addModule('keyboard');
     this.clipboard = this.theme.addModule('clipboard');
     this.history = this.theme.addModule('history');
-    this.images = this.theme.addModule('images');
     this.theme.init();
     this.pasteHTML(`<div class='editable' style="white-space: normal;">${html}<p><br></p></div>`);
     this.history.clear();
