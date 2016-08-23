@@ -1,0 +1,1011 @@
+@font-face {
+	font-family: 'EditorFont';
+	src: url('../fonts/editorFont.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.i-bold:before
+{
+	content: "\f032";
+}
+
+.i-italic:before
+{
+	content: "\f033";
+}
+
+.i-underline:before
+{
+	content: "\f0cd";
+}
+
+.i-list[type='unordered']:before
+{
+	content: "\f0ca";
+}
+
+.i-list[type='ordered']:before
+{
+	content: "\f0cb";
+}
+
+.i-script[type='sup']:before
+{
+	content: "\f12b";
+}
+
+.i-script[type='sub']:before
+{
+	content: "\f12c";
+}
+
+.i-arrow-left:before {
+	content: "\f053";
+}
+
+.i-arrow-right:before {
+	content: "\f054";
+}
+
+.i-image:before {
+	content: "\f03e";
+}
+
+.i-link:before {
+	content: "\f0c1";
+}
+
+.i-align-left:before {
+	content: "\f036";
+}
+
+.i-align-center:before {
+	content: "\f037";
+}
+
+.i-align-right:before {
+	content: "\f038";
+}
+
+.i-fullscreen:before {
+	content: "\f0b2";
+}
+
+/* Editor classes */
+
+.tabContent .editable
+{
+	border: 1px solid #f2f2f2;
+	padding: 8px 3px;
+	border-radius: 0px;
+
+	padding: 5px;
+
+	min-height: 500px;
+	max-height: 500px;
+
+	font-family: Arial,sans-serif;
+	font-size: 10pt;
+	overflow-y: auto;
+	box-sizing: border-box;
+
+	tab-size: 4;
+	-moz-tab-size: 4;
+
+	text-align: left;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+.editable.isBlank::before {
+	color: rgba(0,0,0,0.3);
+	content: attr(data-placeholder);
+	font-style: italic;
+	pointer-events: none;
+	position: absolute;
+}
+
+.tabContent .editable p
+{
+	margin: 2px 0px 10px;
+}
+
+.editorButtonPanel
+{
+	height: 30px;
+}
+
+.editorButtonPanel + .editorContainer { margin-top: 5px; }
+
+.buttonGroup .icon, .editorSuggest .icon
+{
+	display: inline-block;
+	font: normal normal normal 14px/1 EditorFont;
+	font-size: inherit;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.editorButtonPanel .buttonGroup, .imageTools .buttonGroup
+{
+	margin-right: 10px;
+	display: inline-block;
+}
+
+.buttonGroup:last-child
+{
+	margin-right: 0px;
+}
+
+.buttonGroup .button
+{
+	display: inline-block;
+	box-sizing: border-box;
+	border: 1px solid #f2f2f2;
+	padding: 4px;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+	text-align: center;
+	z-index: 1;
+	position: relative;
+}
+
+.buttonGroup .button:first-child
+{
+	border-radius: 3px 0px 0px 3px;
+}
+
+.buttonGroup .button:last-child
+{
+	border-radius: 0px 3px 3px 0px;
+}
+
+.buttonGroup .button:first-child:last-child
+{
+	border-radius: 3px;
+}
+
+.buttonGroup .button:not(:first-child)
+{
+	margin-left: -1px;
+}
+
+.buttonGroup .button:hover
+{
+	border: 1px solid #def0f6;
+	z-index: 10;
+}
+
+.buttonGroup .button:active
+{
+	box-shadow: inset 0px 0px 3px rgba(0,0,0,0.25);
+}
+
+.buttonGroup .button.active
+{
+	background-color: #dceff5;
+	border: 1px solid #dceff5;
+	z-index: 2;
+}
+
+.buttonGroup .button .icon
+{
+	vertical-align: middle;
+	font-size: 11px;
+	color: #777;
+}
+
+.buttonGroup .button.active .icon
+{
+	color: #1a97c0;
+}
+
+.buttonGroup .button::after
+{
+	display: inline-block;
+	width: 25px; height: 10px;
+	vertical-align: middle;
+}
+
+.entityList .spItem::after
+{
+	display: none;
+}
+
+.spItem:not([used])
+{
+	color: #999;
+}
+.spItem:not([used])[icon]::before
+{
+	color: #ccc;
+}
+.spItem.pinned[icon]::before
+{
+	color: #d94454;
+}
+
+.entityList .spItem + .spItem
+{
+	padding-left: 30px;
+}
+
+.editable .objectNode
+{
+	height: 18px;
+	margin: 0px 1px;
+	padding: 0px 7px 0px 23px;
+
+	border: 1px dotted #dceff5;
+	background-color: #dceff5;
+	color: #333;
+
+	border-radius: 10em;
+	cursor: pointer;
+
+	font-weight: normal!important;
+	text-decoration: none!important;
+	font-style: normal!important;
+
+	white-space: nowrap;
+
+	box-sizing: border-box;
+	display: inline-block;
+	line-height: 1;
+}
+
+.editable .objectLink
+{
+	color: #1a97c0;
+	text-decoration: underline;
+	cursor: pointer;
+	margin: 0px 1px;
+}
+
+.editable .new.objectNode
+{
+	border: 1px dotted #1a97c0;
+	background-color: #fff;
+	color: #667;
+}
+
+.editable .new.objectNode:not([type])
+{
+	padding: 2px 7px;
+}
+
+.editable .objectNode:focus, .editable .objectNode:active { border: 1px solid red;}
+
+.editable .objectNode:active, .editable .objectNode:focus {
+	border-color: #2d8ac7;
+}
+
+.dropZone
+{
+	background-color: #dceff5;
+	display: inline;
+	border-radius: 10em;
+	padding: 0px 25px;
+	vertical-align: baseline;
+}
+
+.editable p:first-child, .editable ul:first-child, .editable ol:first-child { margin-top: 0px; }
+
+.editable sup { vertical-align: super; }
+.editable sub { vertical-align: sub; }
+
+.entityList.fixed
+{
+	position: fixed;
+	top: 12px;
+	overflow-y: auto;
+	bottom: 12px;
+	margin-top: 0px;
+}
+
+.entityList
+{
+	width: 300px;
+	padding-right: 15px;
+	margin-top: 30px;
+}
+
+.entityList .intemNumber
+{
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background-color: rgba(255,255,255,0.8);
+	padding: 3px 6px;
+	color: #98d0e1;
+	border-radius: 3px;
+	text-align: center;
+	font: 400 7pt "Roboto", Arial;
+}
+
+.entityList .plateBox
+{
+	position: relative;
+}
+
+.entityBox
+{
+	margin: 5px 0px;
+	padding: 0px 50px 0px 15px;
+}
+
+
+.entitySwitchBlock
+{
+	position: relative;
+	margin: 5px 0px;
+	padding: 5px 50px 5px 40px;
+	cursor: pointer;
+}
+.entityBlock h5
+{
+	font: 300 8pt "Roboto", Arial;
+	color: #8fc391;
+	text-transform: uppercase;
+}
+
+.entityList .plateBlock:not(:first-child)
+{
+	margin-top: 5px;
+}
+
+.entityList.fixed .plateBlock:first-child
+{
+	margin-top: 0px;
+}
+
+.entityList .isNew .plateBox
+{
+	background-color: #f2f2f2;
+}
+
+.entityList .spItem::before
+{
+	cursor: move;
+}
+
+.entityList .linkedEntities, .entityList .linkedHandles
+{
+	margin-left: 30px;
+}
+
+.ghostImage, .ghostImage.IE
+{
+	display: inline-block;
+	padding: 5px 5px 5px 40px;
+	border-radius: 5px;
+	background-color: #dceff5;
+	opacity: 1;
+	height: 16px;
+}
+
+.ghostImage.IE
+{
+	display: none;
+}
+
+.spItem.ghostImage::before
+{
+	left: 5px;
+	top: 3px;
+}
+
+body > .ghostImage{
+	position: absolute;
+	left: -9999px;
+}
+
+.editorSuggest
+{
+	display: none;
+	position: absolute;
+	box-shadow: 0px 5px 5px rgba(27, 153, 191, 0.2);
+	border-radius: 5px;
+	background-color: #dceff5;
+}
+.editorSuggest .suggestBox
+{
+	max-height: 200px;
+	overflow-y: auto;
+	margin-top: 0px;
+	display: block;
+	border-radius: 5px;
+}
+
+.editorSuggest.open
+{
+	display: block;
+}
+
+.editorSuggest.fixTop
+{
+	transform: translateY(-100%);
+}
+
+.editorSuggest .suggestItem
+{
+	padding: 3px 35px 3px 20px;
+	white-space: nowrap;
+}
+
+.editorSuggest.isSub .suggestBox
+{
+	border-radius: 0px 0px 5px 5px;
+}
+
+.editorSuggest.isSub .suggestItem
+{
+	margin-left: 31px;
+	padding-left: 20px;
+}
+
+.editorSuggest .suggestItem[index]
+{
+	position: relative;
+}
+
+.entityList .entityBox .spItem[index]::after
+{
+	content: attr(index) "";
+	position: absolute;
+	right: 10px;
+	top: 4px;
+
+	font: 400 7pt "Roboto", Arial;
+	background-color: rgba(255,255,255,0.4);
+	color: #98d0e1;
+	padding: 1px 5px;
+	border-radius: 3px;
+	text-align: center;
+	display: block;
+}
+
+.entityIndex
+{
+	font: 400 7pt "Roboto", Arial;
+	color: #96d0e2;
+	text-align: center;
+	position: relative;
+	top: -5px;
+	margin-right: 2px;
+}
+
+.dataPopupHeader .entityIndex
+{
+	color: rgba(255,255,255,.5);
+}
+
+.awesomeSelect .entityIndex
+{
+	text-shadow: 1px 1px 0px #fff;
+}
+
+.editable .objectNode[index]
+{
+	position: relative;
+	padding-right: 0px;
+}
+
+.editable .objectNode[index]::after
+{
+	left: inherit;
+	right: 0px;
+	top: -1px;
+	border-radius: 10em;
+	padding: 1px 5px;
+	position: relative;
+
+	content: attr(index) "";
+
+	font: 400 7pt "Roboto", Arial;
+	color: #96d0e2;
+	text-align: center;
+}
+
+.actionButton.rightSide
+{
+	left: 0px;
+	right: auto;
+	border-radius: 3px 0px 0px 3px;
+	border-right: 1px solid rgba(0,0,0, 0.025);
+}
+
+.actionButton.rightSide.back .icon
+{
+	transform: translateY(-50%);
+	top: 50%;
+	position: absolute;
+	left: 10px;
+	color: #fff;
+}
+
+
+.entityBlock:hover .actionButton::before, .linkageForm:hover .actionButton::before
+{
+	display: block;
+}
+
+.editorSuggest .dataPopupHeader
+{
+	padding: 5px 8px;
+	margin-left: 31px;
+	border-radius: 0px 3px 0px 0px;
+}
+
+.editable .objectNode[type]
+{
+	padding-left: 7px;
+}
+
+.editable .objectNode[type]::before, .editorSuggest .suggestItem[icon]::before, .editorSuggest .dataPopupHeader h5[icon]::before {
+	content: "";
+	font: 400 12pt Intel471;
+	color: #96d0e2;
+	position: relative;
+	top: 2px;
+	left: -2px;
+}
+
+.editorSuggest .dataPopupHeader h5[icon]
+{
+	padding-left: 25px;
+}
+
+.editorSuggest .dataPopupHeader h5[icon]::before
+{
+	left: 0px;
+	color: #fff;
+}
+
+.editorSuggest .suggestItem[icon]::before
+{
+	top: 2px;
+	left: 0px;
+}
+
+.editorSuggest.isSub .suggestItem[icon]::before
+{
+	left: 0px;
+}
+
+.editable .new.objectNode
+{
+	padding-left: 7px;
+}
+
+.editorSuggest .suggestContainer
+{
+	position: relative;
+	background-color: #dceff5;
+	border-radius: 3px;
+}
+
+.suggestItem .showSubs
+{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	color: #dceff5;
+	z-index: 2;
+	text-align: center;
+	padding: 3px 10px;
+	display: none;
+}
+
+.suggestItem:hover .showSubs
+{
+	display: block;
+}
+
+.suggestItem .showSubs:hover
+{
+	color: #96d0e2;
+}
+
+.entityTooltip
+{
+	display: none;
+	position: absolute;
+	left: 5px;
+	transform: translateY(100%);
+	background-color: rgba(83, 177, 208, 0.96);
+	box-shadow: 0px 3px 10px rgba(0,0,0,0.15);
+	border-radius: 0px 4px 4px 4px;
+	padding: 10px 15px;
+	font: 400 9pt "Roboto", Arial;
+	color: #dceff5;
+}
+
+.entityTooltip::before
+{
+	content: "";
+	width: 0px;
+	height: 0px;
+	top: -10px;
+	left: 0px;
+	position: absolute;
+	border-top: 10px solid transparent;
+	border-left: 10px solid rgba(83, 177, 208, 0.96);
+}
+
+.editorTooltipActivator .entityTooltip
+{
+	display: block;
+}
+
+.entityTooltip .entity
+{
+	color: #fff;
+}
+
+.otherHandles span
+{
+	color: #1a97c0;
+}
+
+.linkageInfo
+{
+	padding: 10px 15px 5px;
+	margin: 0px;
+}
+
+.entityBlock, .linkageForm
+{
+	position: relative;
+	overflow: hidden;
+}
+
+.linkageForm
+{
+	background: linear-gradient(to right, #dceff5 20px, #fff 20px, #fff 21px, #dceff5 21px);
+}
+.linkageForm .formBox
+{
+	padding: 0px;
+}
+
+.linkageInfo::before
+{
+	content: "";
+	width: 5px;
+	height: 25px;
+	border-radius: 0px 4px 4px 0px;
+	position: absolute;
+	top: 7px;
+	left: 0px;
+	background-color: #53b1d0;
+}
+.linkageInfo:hover::before
+{
+	width: 7px;
+}
+
+.linkageNotSet.linkageInfo
+{
+	color: #b2b2b2;
+}
+.linkageNotSet.linkageInfo::before
+{
+	background-color: #e6e6e6;
+}
+
+.unknownItemType.linkageInfo
+{
+	color: #d94454;
+}
+.unknownItemType.linkageInfo::before
+{
+	background-color: #d94454;
+}
+
+.editorContainer .popupBlock
+{
+	background-color: #def0f6;
+	position: absolute;
+	min-width: 300px;
+	z-index: 10;
+	border-radius: 0px 5px 5px 5px;
+	box-shadow: 0px 5px 5px rgba(27, 153, 191, 0.2);
+	margin-top: 10px;
+}
+
+.editorContainer .popupBlock::before
+{
+	content: "";
+	width: 0px;
+	height: 0px;
+	top: -10px;
+	left: 0px;
+	position: absolute;
+	border-top: 10px solid transparent;
+	border-left: 10px solid #def0f6;
+}
+
+.editorContainer .popupBlock .popupBox
+{
+	padding: 0px 20px;
+	margin: 20px 0px;
+}
+
+.editorContainer .popupBlock .subAction
+{
+	color: #84c4d9;
+}
+
+/* AWESOME SELECT */
+
+.awesomeSelect
+{
+	font: 400 9pt "Roboto", Arial;
+	color: #1a97c0;
+}
+
+.awesomeCaption,
+.selected .awesomeOption, .disabled .awesomeOption
+{
+	display: none;
+}
+.selected .awesomeCaption, .disabled .awesomeCaption
+{
+	display: block;
+}
+.disabled .awesomeCaption
+{
+	color: #4d4d4d;
+	cursor: text;
+}
+.awesomeOption, .awesomeCaption
+{
+	cursor: pointer;
+	padding: 3px 35px 3px 35px;
+	position: relative;
+}
+.awesomeOption:hover, .awesomeSelect:not(.disabled) .awesomeCaption:hover
+{
+	background: #fff;
+}
+.awesomeOption::before, .awesomeCaption:not([icon])::before
+{
+	content: "";
+	display: block;
+	width: 9px;
+	height: 9px;
+	position: absolute;
+	border-radius: 10em;
+}
+.awesomeCaption:not([icon])::before
+{
+	background-color: #53b1d0;
+	border: 2px solid #fff;
+	top: 5px;
+	left: 14px;
+}
+.awesomeCaption[icon]::before
+{
+	display: block;
+	width: 21px;
+	height: 21px;
+	position: absolute;
+	font: 400 11pt/23px "Intel471";
+	color: #96d0e2;
+	left: 9px;
+	top: 0px;
+	border-radius: 10em;
+	background-color: #fff;
+	text-align: center;
+}
+
+.awesomeOption::before
+{
+	background-color: #fff;
+	top: 7px;
+	left: 16px;
+}
+
+.disabled .awesomeCaption:not([icon])::before, .awesomeOption:hover::before
+{
+	background-color: #dceff5;
+}
+
+.editorContainer .clipboard
+{
+	left: -100000px;
+	position: absolute;
+	top: 50%;
+	height: 1px;
+	overflow-y: hidden;
+}
+
+.editorContainer .clipboard p
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Images Panel */
+
+.editorImagesPanel
+{
+	padding: 10px;
+	margin: 5px 0px;
+	border-radius: 5px;
+	background-color: #dceff5;
+	overflow-y: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
+	box-sizing: border-box;
+	max-width: 920px;
+}
+
+.editorImagesPanel .imageBox
+{
+	box-sizing: border-box;
+	cursor: pointer;
+	display: inline-block;
+	width: 100px;
+	height: 100px;
+	border: 1px solid #fff;
+	background-size: cover;
+	vertical-align: bottom;
+	border-radius: 5px;
+}
+
+.imageBox + .imageBox { margin-left: 5px; }
+
+.editable .objectImage
+{
+	margin: 2px;
+	padding: 10px 0px 15px;
+	position: relative;
+	min-height: 100px;
+	border-radius: 5px;
+	background-color: #fafafa;
+	overflow: hidden;
+	-webkit-transform: rotate(0.000001deg);
+	display: inline-block;
+	width: calc(100% - 4px);
+}
+
+.objectImage .oiBox
+{
+	padding: 0px 25px;
+	display: flex;
+	flex-direction: column;
+	height: inherit;
+}
+
+.editable .objectImage:last-child
+{
+	margin-bottom: 2px;
+}
+
+.editable .objectImage .image
+{
+	background-size: contain;
+	background-position: 0% 0%;
+	background-repeat: no-repeat;
+	vertical-align: middle;
+	cursor: pointer;
+	flex: 1 1 auto;
+}
+
+.editable .objectImage .actionButton
+{
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.objectImage .description + .image { margin-top: 10px; }
+
+.objectImage .description
+{
+	cursor: pointer;
+	user-select: none;
+	flex: 0 1 auto;
+}
+.objectImage .description:empty { display: none; }
+
+.editable .objectImage:hover .actionButton::before
+{
+	display: block;
+}
+
+.imageTools
+{
+	position: absolute;
+	z-index: 100;
+	transform: translateX(-50%);
+	background-color: #fff;
+	box-shadow: 0px 5px 5px rgba(27, 153, 191, 0.2);
+	padding: 3px 5px;
+	border-radius: 2px;
+	height: 30px;
+	border: 1px solid rgba(27, 153, 191, 0.05);
+}
+
+.buttonGroup .ql-image.button.active
+{
+	background-color: #dceff5;
+	position: relative;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.ql-image.button.active::after
+{
+	content: "";
+	position: absolute;
+	width: 28px;
+	height: 7px;
+	display: block;
+	background-color: #dceff5;
+	bottom: -7px;
+	left: -1px;
+	border-left: 1px solid #dceff5;
+	border-right: 1px solid #dceff5;
+	z-index: 10;
+}
+
+.objectImage .resizeBar
+{
+	height: 3px;
+	width: 100%;
+	background-color: #dceff5;
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	cursor: row-resize;
+	text-align: center;
+}
+
+.objectImage:hover .resizeBar
+{
+	height: 6px;
+}
+
+.objectImage:hover .resizeBar:before
+{
+	content: "";
+	width: 4px;
+	height: 4px;
+	border-radius: 10em;
+	background-color: #96d0e2;
+	display: inline-block;
+	position: absolute;
+	top: 1px;
+	left: 50%;
+}
+
+.fullscreenEditor
+{
+	position: fixed;
+}
+
+.fullscreenEditor .tab.active + .tabContainer .editorBlock {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	right: 0px;
+	background-color: #fff;
+	z-index: 9999;
+	display: block;
+	margin: 0px;
+	padding: 10px;
+	max-width: none;
+	display: flex;
+	flex-direction: column;
+}
+
+.fullscreenEditor .tab.active + .tabContainer .tab.active + .tabContainer .editorButtonPanel { flex: 0 1 auto; }
+.fullscreenEditor .tab.active + .tabContainer .editorImagesPanel { flex: 0 0 auto; max-width: none; }
+.fullscreenEditor .tab.active + .tabContainer .editorContainer { flex: 1 1 100%; overflow: hidden; }
+.fullscreenEditor .tab.active + .tabContainer .editable { height: 100%; min-height: 100px; max-height: none; }

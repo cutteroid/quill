@@ -17,10 +17,12 @@ var constantPack = new webpack.DefinePlugin({
 module.exports = {
   context: path.resolve(__dirname, '..'),
   entry: {
-    'quill': ['./quill.js'],
+    'quill': ['./custom.js'],
     'quill.core': [
-      './core.js',
-      './assets/core.styl'
+      './core.js'
+    ],
+    'quill.custom': [
+      './custom.js'
     ],
     'quill.bubble': './assets/bubble.styl',
     'quill.snow': './assets/snow.styl',
@@ -56,7 +58,9 @@ module.exports = {
     noParse: [
       /\/node_modules\/clone\/clone\.js$/,
       /\/node_modules\/eventemitter3\/index\.js$/,
-      /\/node_modules\/extend\/index\.js$/
+      /\/node_modules\/extend\/index\.js$/,
+      /\.css$/,
+      /\.woff$/
     ]
   },
   ts: {

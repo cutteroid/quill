@@ -13,6 +13,9 @@ let debug = logger('quill');
 
 
 class Quill {
+
+
+
   static debug(limit) {
     logger.level(limit);
   }
@@ -56,10 +59,11 @@ class Quill {
     if (options.debug) {
       Quill.debug(options.debug);
     }
+
     let html = this.container.innerHTML.trim();
-    this.container.classList.add('ql-container');
+    this.container.classList.add('editorContainer');
     this.container.innerHTML = '';
-    this.root = this.addContainer('ql-editor');
+    this.root = this.addContainer('editable');
     this.emitter = new Emitter();
     this.scroll = Parchment.create(this.root, {
       emitter: this.emitter,
@@ -72,7 +76,7 @@ class Quill {
     this.clipboard = this.theme.addModule('clipboard');
     this.history = this.theme.addModule('history');
     this.theme.init();
-    this.pasteHTML(`<div class='ql-editor' style="white-space: normal;">${html}<p><br></p></div>`);
+    this.pasteHTML(`<div class='editable' style="white-space: normal;">${html}<p><br></p></div>`);
     this.history.clear();
     if (options.readOnly) {
       this.disable();
@@ -80,9 +84,9 @@ class Quill {
     if (options.placeholder) {
       this.root.dataset.placeholder = options.placeholder;
     }
-    this.root.classList.toggle('ql-blank', this.editor.isBlank());
+    this.root.classList.toggle('isBlank', this.editor.isBlank());
     this.emitter.on(Emitter.events.TEXT_CHANGE, (delta) => {
-      this.root.classList.toggle('ql-blank', this.editor.isBlank());
+      this.root.classList.toggle('isBlank', this.editor.isBlank());
     });
   }
 
@@ -312,7 +316,6 @@ Quill.imports = {
   'core/module' : Module,
   'core/theme'  : Theme
 };
-
 
 function expandConfig(container, userConfig) {
   userConfig = extend(true, {

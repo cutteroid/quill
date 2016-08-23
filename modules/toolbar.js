@@ -24,7 +24,7 @@ class Toolbar extends Module {
     if (!(this.container instanceof HTMLElement)) {
       return debug.error('Container required for toolbar', this.options);
     }
-    this.container.classList.add('ql-toolbar');
+    this.container.classList.add('editorButtonPanel');
     this.controls = [];
     this.handlers = {};
     Object.keys(this.options.handlers).forEach((format) => {
@@ -33,7 +33,7 @@ class Toolbar extends Module {
     this.container.addEventListener('mousedown', function(e) {
       e.preventDefault();   // Prevent blur
     });
-    [].forEach.call(this.container.querySelectorAll('button, select'), (input) => {
+    [].forEach.call(this.container.querySelectorAll('.button'), (input) => {
       this.attach(input);
     });
     this.quill.on(Quill.events.EDITOR_CHANGE, (type, range) => {
@@ -55,11 +55,11 @@ class Toolbar extends Module {
     let format = [].find.call(input.classList, (className) => {
       return className.indexOf('ql-') === 0;
     });
+
     if (!format) return;
+
     format = format.slice('ql-'.length);
-    if (input.tagName === 'BUTTON') {
-      input.setAttribute('type', 'button');
-    }
+
     if (this.handlers[format] == null) {
       if (this.quill.scroll.whitelist != null && this.quill.scroll.whitelist[format] == null) {
         debug.warn('ignoring attaching to disabled format', format, input);
@@ -82,10 +82,10 @@ class Toolbar extends Module {
           value = selected.value || false;
         }
       } else {
-        if (input.classList.contains('ql-active')) {
+        if (input.classList.contains('active')) {
           value = false;
         } else {
-          value = input.value || !input.hasAttribute('value');
+          value = input.getAttribute('type') || !input.hasAttribute('type');
         }
         e.preventDefault();
       }
@@ -135,13 +135,19 @@ class Toolbar extends Module {
         }
       } else {
         if (range == null) {
-          input.classList.remove('ql-active');
-        } else if (input.hasAttribute('value')) {
+          input.classList.remove('active');
+        } else if (input.hasAttribute('type')) {
           // both being null should match (default values)
           // '1' should match with 1 (headers)
-          input.classList.toggle('ql-active', formats[format] == input.value || (formats[format] == null && !input.value));
+          let type = input.getAttribute('type');
+          console.debug(formats[format],  type, formats[format] == type);
+          let active = formats[format] == type || (formats[format] == null && !type)
+          input.classList.toggle('active', active);
         } else {
-          input.classList.toggle('ql-active', formats[format] != null);
+          let active = formats[format] != null;
+          if (format === 'image' && images && images.openedPanel != null) active = true;
+          if (format === 'fullscreen' && body.classList.contains('fullscreenEditor')) active = true;
+          input.classList.toggle('active', active);
         }
       }
     });
@@ -149,15 +155,20 @@ class Toolbar extends Module {
 }
 Toolbar.DEFAULTS = {};
 
-
 function addButton(container, format, value) {
-  let input = document.createElement('button');
-  input.setAttribute('type', 'button');
-  input.classList.add('ql-' + format);
+  let button = document.createElement('div');
+  let icon = document.createElement('span');
+  button.classList.add('button');
+  button.classList.add('ql-'+format);
+  icon.classList.add('icon');
+  icon.classList.add('i-' + format);
+
   if (value != null) {
-    input.value = value;
+    button.setAttribute('type', value);
+    icon.setAttribute('type', value);
   }
-  container.appendChild(input);
+  button.appendChild(icon);
+  container.appendChild(button);
 }
 
 function addControls(container, groups) {
@@ -166,7 +177,8 @@ function addControls(container, groups) {
   }
   groups.forEach(function(controls) {
     let group = document.createElement('span');
-    group.classList.add('ql-formats');
+    group.classList.add('buttonGroup');
+    if (controls.indexOf('fullscreen') != -1) group.classList.add('rFloat');
     controls.forEach(function(control) {
       if (typeof control === 'string') {
         addButton(group, control);

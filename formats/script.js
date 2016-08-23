@@ -13,7 +13,7 @@ class Script extends Inline {
 
   static formats(domNode) {
     if (domNode.tagName === 'SUB') return 'sub';
-    if (domNode.tagName === 'SUP') return 'super';
+    if (domNode.tagName === 'SUP') return 'sup';
     return undefined;
   }
 }

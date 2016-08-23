@@ -12,6 +12,7 @@ let debug = logger('quill:keyboard');
 
 const SHORTKEY = /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
 
+const FORMATS_BLACKLIST = ["link"];
 
 class Keyboard extends Module {
   static match(evt, binding) {
@@ -48,7 +49,6 @@ class Keyboard extends Module {
     this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: false }, handleDelete);
     this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: false }, handleDelete);
     this.listen();
-    this.formatsBlacklist = ["link"];
   }
 
   addBinding(key, context = {}, handler = {}) {
@@ -246,7 +246,7 @@ function handleEnter(range, context) {
   Object.keys(context.format).forEach((name) => {
     if (lineFormats[name] != null) return;
     if (Array.isArray(context.format[name])) return;
-    if (this.formatsBlackList.indexOf(name) != -1) return;
+    if (FORMATS_BLACKLIST.indexOf(name) != -1) return;
     this.quill.format(name, context.format[name], Quill.sources.USER);
   });
 }

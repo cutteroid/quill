@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<link rel="stylesheet" href="style.css" />
+
+	<style>
+		#snow-container {
+			height: 350px;
+		}
+		.standalone-container {
+			margin: 50px auto;
+			width: 720px;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div class="standalone-container tabContent">
+		<div id="snow-container"></div>
+	</div>
+
+	<script type="text/javascript" src="/1.0.0-rc.0/quill.js"></script>
+
+	<script>
+		var snowQuill = new Quill('#snow-container', {
+			placeholder: 'Compose an epic...',
+			theme: 'snow'
+		});
+	</script>
+
+</body>
+</html>
