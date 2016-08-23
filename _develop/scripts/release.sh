@@ -6,12 +6,12 @@ mkdir .release
 mkdir .release/quill
 
 npm run build
-cp dist/quill.css dist/quill.bubble.css dist/quill.snow.css dist/quill.js .release/quill/
-uglifyjs .release/quill/quill.js > .release/quill/quill.min.js
+webpack --minimize --config _develop/webpack.config.js
+cp dist/quill.core.css dist/quill.bubble.css dist/quill.snow.css dist/quill.js dist/quill.core.js .release/quill/
 
 cd .release
 
-printf "cdn: .\nversion: ." > jekyll.yml
+printf "cdn: .\nversion: .\nquill: quill.js" > jekyll.yml
 jekyll build -s ../node_modules/quill-docs -d _site --config ../node_modules/quill-docs/_config.yml,jekyll.yml
 
 mkdir quill/examples

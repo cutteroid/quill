@@ -3,7 +3,6 @@ import Parchment from 'parchment';
 import Quill from '../core/quill';
 import logger from '../core/logger';
 import Module from '../core/module';
-import { BlockEmbed } from '../blots/block';
 
 import { AlignStyle } from '../formats/align';
 import { BackgroundStyle } from '../formats/background';
@@ -14,6 +13,18 @@ import { SizeStyle } from '../formats/size';
 
 let debug = logger('quill:clipboard');
 
+const CLIPBOARD_CONFIG = [
+  [Node.TEXT_NODE, matchText],
+  ['br', matchBreak],
+  [Node.ELEMENT_NODE, matchNewline],
+  [Node.ELEMENT_NODE, matchBlot],
+  [Node.ELEMENT_NODE, matchSpacing],
+  [Node.ELEMENT_NODE, matchAttributor],
+  [Node.ELEMENT_NODE, matchStyles],
+  ['b', matchAlias.bind(matchAlias, 'bold')],
+  ['i', matchAlias.bind(matchAlias, 'italic')],
+  ['style', matchIgnore]
+];
 
 const STYLE_ATTRIBUTORS = [
   AlignStyle,
@@ -30,16 +41,13 @@ const STYLE_ATTRIBUTORS = [
 
 class Clipboard extends Module {
   constructor(quill, options) {
-    if (options.matchers !== Clipboard.DEFAULTS.matchers) {
-      options.matchers = Clipboard.DEFAULTS.matchers.concat(options.matchers);
-    }
     super(quill, options);
     this.quill.root.addEventListener('paste', this.onPaste.bind(this));
     this.container = this.quill.addContainer('ql-clipboard');
     this.container.setAttribute('contenteditable', true);
     this.container.setAttribute('tabindex', -1);
     this.matchers = [];
-    this.options.matchers.forEach((pair) => {
+    CLIPBOARD_CONFIG.concat(this.options.matchers).forEach((pair) => {
       this.addMatcher(...pair);
     });
   }
@@ -48,66 +56,58 @@ class Clipboard extends Module {
     this.matchers.push([selector, matcher]);
   }
 
-  clean() {
-    let treeWalker = document.createTreeWalker(
-      this.container,
-      NodeFilter.SHOW_COMMENT,
-      { acceptNode: function(node) { return NodeFilter.FILTER_ACCEPT; } },
-      false
-    );
-    let comments = [];
-    while(treeWalker.nextNode()) {
-      comments.push(treeWalker.currentNode);
-    }
-    comments.forEach(function(node) {
-      if (node != null && node.parentNode != null) {
-        node.parentNode.removeChild(node);
-      }
-    });
-    this.container.normalize();
-  }
-
   convert(html) {
     const DOM_KEY = '__ql-matcher';
     if (typeof html === 'string') {
       this.container.innerHTML = html;
     }
-    this.clean();
+    let textMatchers = [], elementMatchers = [];
     this.matchers.forEach((pair) => {
       let [selector, matcher] = pair;
-      if (typeof selector === 'string') {
-        [].forEach.call(this.container.querySelectorAll(selector), (node) => {
-          // TODO use weakmap
-          node[DOM_KEY] = node[DOM_KEY] || [];
-          node[DOM_KEY].push(matcher);
-        });
+      switch (selector) {
+        case Node.TEXT_NODE:
+          textMatchers.push(matcher);
+          break;
+        case Node.ELEMENT_NODE:
+          elementMatchers.push(matcher);
+          break;
+        default:
+          [].forEach.call(this.container.querySelectorAll(selector), (node) => {
+            // TODO use weakmap
+            node[DOM_KEY] = node[DOM_KEY] || [];
+            node[DOM_KEY].push(matcher);
+          });
+          break;
       }
     });
     let traverse = (node) => {  // Post-order
-      return [].reduce.call(node.childNodes || [], (delta, childNode) => {
-        if (childNode.nodeType !== Node.ELEMENT_NODE && childNode.nodeType !== Node.TEXT_NODE) {
-          return delta;
-        }
-        let childrenDelta = traverse(childNode);
-        childrenDelta = this.matchers.reduce(function(childrenDelta, pair) {
-          let [type, matcher] = pair;
-          if (type === true || childNode.nodeType === type) {
-            childrenDelta = matcher(childNode, childrenDelta);
+      if (node.nodeType === node.TEXT_NODE) {
+        return textMatchers.reduce(function(delta, matcher) {
+          return matcher(node, delta);
+        }, new Delta());
+      } else if (node.nodeType === node.ELEMENT_NODE) {
+        return [].reduce.call(node.childNodes || [], (delta, childNode) => {
+          let childrenDelta = traverse(childNode);
+          if (childNode.nodeType === node.ELEMENT_NODE) {
+            childrenDelta = elementMatchers.reduce(function(childrenDelta, matcher) {
+              return matcher(childNode, childrenDelta);
+            }, childrenDelta);
+            childrenDelta = (childNode[DOM_KEY] || []).reduce(function(childrenDelta, matcher) {
+              return matcher(childNode, childrenDelta);
+            }, childrenDelta);
           }
-          return childrenDelta;
-        }, childrenDelta);
-        childrenDelta = (childNode[DOM_KEY] || []).reduce(function(childrenDelta, matcher) {
-          return matcher(childNode, childrenDelta);
-        }, childrenDelta);
-        return delta.concat(childrenDelta);
-      }, new Delta());
+          return delta.concat(childrenDelta);
+        }, new Delta());
+      } else {
+        return new Delta();
+      }
     };
     let delta = traverse(this.container);
     // Remove trailing newline
     if (deltaEndsWith(delta, '\n') && delta.ops[delta.ops.length - 1].attributes == null) {
       delta = delta.compose(new Delta().retain(delta.length() - 1).delete(1));
     }
-    debug.info('convert', this.container.innerHTML, delta);
+    debug.log('convert', this.container.innerHTML, delta);
     this.container.innerHTML = '';
     return delta;
   }
@@ -115,31 +115,32 @@ class Clipboard extends Module {
   onPaste(e) {
     if (e.defaultPrevented) return;
     let range = this.quill.getSelection();
-    let clipboard = e.clipboardData || window.clipboardData;
     let delta = new Delta().retain(range.index).delete(range.length);
-    this.container.focus();
-    setTimeout(() => {
-      let html = this.container.innerHTML;
+    let types = e.clipboardData.types;
+    if ((types instanceof DOMStringList && types.contains("text/html")) ||
+        (types.indexOf && types.indexOf('text/html') !== -1)) {
+      this.container.innerHTML = e.clipboardData.getData('text/html');
+      paste.call(this);
+      e.preventDefault();
+    } else {
+      let bodyTop = document.body.scrollTop;
+      this.container.focus();
+      setTimeout(() => {
+        paste.call(this);
+        document.body.scrollTop = bodyTop;
+        this.quill.selection.scrollIntoView();
+      }, 1);
+    }
+    function paste() {
       delta = delta.concat(this.convert());
       this.quill.updateContents(delta, Quill.sources.USER);
       // range.length contributes to delta.length()
       this.quill.setSelection(delta.length() - range.length, Quill.sources.SILENT);
-      this.quill.selection.scrollIntoView();
-    }, 1);
+    }
   }
 }
 Clipboard.DEFAULTS = {
-  matchers: [
-    [Node.TEXT_NODE, matchText],
-    ['br', matchBreak],
-    [Node.ELEMENT_NODE, matchNewline],
-    [Node.ELEMENT_NODE, matchBlot],
-    [Node.ELEMENT_NODE, matchSpacing],
-    [Node.ELEMENT_NODE, matchAttributor],
-    [Node.ELEMENT_NODE, matchStyles],
-    ['b', matchAlias.bind(matchAlias, 'bold')],
-    ['i', matchAlias.bind(matchAlias, 'italic')]
-  ]
+  matchers: []
 };
 
 
@@ -194,7 +195,7 @@ function matchBlot(node, delta) {
     let value = match.value(node);
     if (value != null) {
       embed[match.blotName] = value;
-      delta.insert(embed, match.formats(node));
+      delta = new Delta().insert(embed, match.formats(node));
     }
   } else if (typeof match.formats === 'function') {
     let formats = { [match.blotName]: match.formats(node) };
@@ -210,20 +211,23 @@ function matchBreak(node, delta) {
   return delta;
 }
 
+function matchIgnore(node, delta) {
+  return new Delta();
+}
+
 function matchNewline(node, delta) {
-  if (!isLine(node)) return delta;
-  if (computeStyle(node).whiteSpace.startsWith('pre') || !deltaEndsWith(delta, '\n')) {
+  if (isLine(node) && !deltaEndsWith(delta, '\n')) {
     delta.insert('\n');
   }
   return delta;
 }
 
 function matchSpacing(node, delta) {
-  if (isLine(node) &&
-      node.nextElementSibling != null &&
-      node.nextElementSibling.offsetTop > node.offsetTop + node.offsetHeight*1.5 &&
-      !deltaEndsWith(delta, '\n\n')) {
-    delta.insert('\n');
+  if (isLine(node) && node.nextElementSibling != null && !deltaEndsWith(delta, '\n\n')) {
+    let nodeHeight = node.offsetHeight + parseFloat(computeStyle(node).marginTop) + parseFloat(computeStyle(node).marginBottom);
+    if (node.nextElementSibling.offsetTop > node.offsetTop + nodeHeight*1.5) {
+      delta.insert('\n');
+    }
   }
   return delta;
 }

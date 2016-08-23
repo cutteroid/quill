@@ -1,13 +1,21 @@
+import extend from 'extend';
 import Emitter from '../core/emitter';
 import Keyboard from '../modules/keyboard';
-import BaseTheme from './base';
+import BaseTheme, { BaseTooltip } from './base';
 import icons from '../ui/icons';
 import { Range } from '../core/selection';
-import Tooltip from '../ui/tooltip';
 
+
+const TOOLBAR_CONFIG = [
+  ['bold', 'italic', 'link'],
+  [{ header: 1 }, { header: 2 }, 'blockquote']
+];
 
 class BubbleTheme extends BaseTheme {
   constructor(quill, options) {
+    if (options.modules.toolbar != null && options.modules.toolbar.container == null) {
+      options.modules.toolbar.container = TOOLBAR_CONFIG;
+    }
     super(quill, options);
     this.quill.container.classList.add('ql-bubble');
   }
@@ -19,37 +27,28 @@ class BubbleTheme extends BaseTheme {
     this.buildPickers([].slice.call(toolbar.container.querySelectorAll('select')));
   }
 }
-BubbleTheme.DEFAULTS = {
+BubbleTheme.DEFAULTS = extend(true, {}, BaseTooltip.DEFAULTS, {
   modules: {
     toolbar: {
-      container: [
-        ['bold', 'italic', 'link'],
-        [{ header: 1 }, { header: 2 }, 'blockquote']
-      ],
       handlers: {
-        formula: function(value) {
-          this.quill.theme.tooltip.edit('formula');
-        },
         link: function(value) {
           if (!value) {
             this.quill.format('link', false);
           } else {
             this.quill.theme.tooltip.edit();
           }
-        },
-        video: function(value) {
-          this.quill.theme.tooltip.edit('video');
         }
       }
     }
   }
-}
+});
 
 
-class BubbleTooltip extends Tooltip {
+class BubbleTooltip extends BaseTooltip {
   constructor(quill, bounds) {
     super(quill, bounds);
-    this.quill.on(Emitter.events.SELECTION_CHANGE, (range) => {
+    this.quill.on(Emitter.events.EDITOR_CHANGE, (type, range) => {
+      if (type !== Emitter.events.SELECTION_CHANGE) return;
       if (range != null && range.length > 0) {
         this.show();
         // Lock our width so we will expand beyond our offsetParent boundaries
@@ -74,11 +73,8 @@ class BubbleTooltip extends Tooltip {
 
   listen() {
     super.listen();
-    ['mousedown', 'touchstart'].forEach((name) => {
-      this.root.querySelector('.ql-close').addEventListener(name, (event) => {
-        this.root.classList.remove('ql-editing');
-        event.preventDefault();
-      });
+    this.root.querySelector('.ql-close').addEventListener('click', (event) => {
+      this.root.classList.remove('ql-editing');
     });
     this.quill.on(Emitter.events.SCROLL_OPTIMIZE, () => {
       // Let selection be restored by toolbar handlers before repositioning

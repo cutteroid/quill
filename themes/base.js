@@ -1,10 +1,12 @@
 import extend from 'extend';
 import Delta from 'rich-text/lib/delta';
 import Emitter from '../core/emitter';
+import Keyboard from '../modules/keyboard';
 import Theme from '../core/theme';
 import ColorPicker from '../ui/color-picker';
 import IconPicker from '../ui/icon-picker';
 import Picker from '../ui/picker';
+import Tooltip from '../ui/tooltip';
 import icons from '../ui/icons';
 
 
@@ -28,24 +30,12 @@ const SIZES = [ 'small', false, 'large', 'huge' ];
 class BaseTheme extends Theme {
   constructor(quill, options) {
     super(quill, options);
-    this.options.modules.toolbar = this.options.modules.toolbar || {};
-    if (this.options.modules.toolbar.constructor !== Object) {
-      this.options.modules.toolbar = {
-        container: this.options.modules.toolbar,
-        handlers: {}
-      };
-    }
-    this.options.modules.toolbar.handlers = extend({},
-      BaseTheme.DEFAULTS.modules.toolbar.handlers,
-      this.constructor.DEFAULTS.modules.toolbar.handlers || {},
-      this.options.modules.toolbar.handlers || {}
-    );
     let listener = (e) => {
       if (!document.body.contains(quill.root)) {
         return document.body.removeEventListener('click', listener);
       }
       if (this.tooltip != null && !this.tooltip.root.contains(e.target) &&
-          document.activeElement !== this.tooltip.textbox) {
+          document.activeElement !== this.tooltip.textbox && !this.quill.hasFocus()) {
         this.tooltip.hide();
       }
       if (this.pickers != null) {
@@ -123,10 +113,13 @@ class BaseTheme extends Theme {
               .on(Emitter.events.SCROLL_OPTIMIZE, update);
   }
 }
-BaseTheme.DEFAULTS = {
+BaseTheme.DEFAULTS = extend(true, {}, Theme.DEFAULTS, {
   modules: {
     toolbar: {
       handlers: {
+        formula: function(value) {
+          this.quill.theme.tooltip.edit('formula');
+        },
         image: function(value) {
           let fileInput = this.container.querySelector('input.ql-image[type=file]');
           if (fileInput == null) {
@@ -152,11 +145,99 @@ BaseTheme.DEFAULTS = {
             this.container.appendChild(fileInput);
           }
           fileInput.click();
+        },
+        video: function(value) {
+          this.quill.theme.tooltip.edit('video');
         }
       }
     }
   }
-};
+});
+
+
+class BaseTooltip extends Tooltip {
+  constructor(quill, boundsContainer) {
+    super(quill, boundsContainer);
+    this.textbox = this.root.querySelector('input[type="text"]');
+    this.listen();
+  }
+
+  listen() {
+    this.textbox.addEventListener('keydown', (event) => {
+      if (Keyboard.match(event, 'enter')) {
+        this.save();
+        event.preventDefault();
+      } else if (Keyboard.match(event, 'escape')) {
+        this.cancel();
+        event.preventDefault();
+      }
+    });
+  }
+
+  cancel() {
+    this.hide();
+  }
+
+  edit(mode = 'link', preview = null) {
+    this.root.classList.remove('ql-hidden');
+    this.root.classList.add('ql-editing');
+    if (preview != null) {
+      this.textbox.value = preview;
+    } else if (mode !== this.root.dataset.mode) {
+      this.textbox.value = '';
+    }
+    this.position(this.quill.getBounds(this.quill.selection.savedRange));
+    this.textbox.select();
+    this.textbox.setAttribute('placeholder', this.textbox.dataset[mode] || '');
+    this.root.dataset.mode = mode;
+  }
+
+  restoreFocus() {
+    let scrollTop = this.quill.root.scrollTop;
+    this.quill.focus();
+    this.quill.root.scrollTop = scrollTop;
+  }
+
+  save() {
+    let value = this.textbox.value;
+    switch(this.root.dataset.mode) {
+      case 'link':
+        let scrollTop = this.quill.root.scrollTop;
+        if (this.linkRange) {
+          this.quill.formatText(this.linkRange, 'link', value, Emitter.sources.USER);
+          delete this.linkRange;
+        } else {
+          this.restoreFocus();
+          this.quill.format('link', value, Emitter.sources.USER);
+        }
+        this.quill.root.scrollTop = scrollTop;
+        break;
+      case 'video':
+        let match = value.match(/^(https?):\/\/(www\.)?youtube\.com\/watch.*v=([a-zA-Z0-9_-]+)/) ||
+                    value.match(/^(https?):\/\/(www\.)?youtu\.be\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+          value = match[1] + '://www.youtube.com/embed/' + match[3] + '?showinfo=0';
+        } else if (match = value.match(/^(https?):\/\/(www\.)?vimeo\.com\/(\d+)/)) {
+          value = match[1] + '://player.vimeo.com/video/' + match[3] + '/';
+        }
+        // fallthrough
+      case 'formula':
+        let range = this.quill.getSelection(true);
+        let index = range.index + range.length;
+        if (range != null) {
+          this.quill.insertEmbed(index, this.root.dataset.mode, value, Emitter.sources.USER);
+          if (this.root.dataset.mode === 'formula') {
+            this.quill.insertText(index + 1, ' ', Emitter.sources.USER);
+          }
+          this.quill.setSelection(index + 2, Emitter.sources.USER);
+        }
+        break;
+      default:
+    }
+    this.textbox.value = '';
+    this.hide();
+  }
+}
 
 
 function fillSelect(select, values, defaultValue = false) {
@@ -172,4 +253,4 @@ function fillSelect(select, values, defaultValue = false) {
 }
 
 
-export default BaseTheme;
+export { BaseTooltip, BaseTheme as default };

@@ -1,13 +1,23 @@
+import extend from 'extend';
 import Emitter from '../core/emitter';
-import BaseTheme from './base';
+import BaseTheme, { BaseTooltip } from './base';
 import LinkBlot from '../formats/link';
 import Picker from '../ui/picker';
 import { Range } from '../core/selection';
-import Tooltip from '../ui/tooltip';
 
+
+const TOOLBAR_CONFIG = [
+  [{ header: ['1', '2', '3', false] }],
+  ['bold', 'italic', 'underline', 'link'],
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  ['clean']
+];
 
 class SnowTheme extends BaseTheme {
   constructor(quill, options) {
+    if (options.modules.toolbar != null && options.modules.toolbar.container == null) {
+      options.modules.toolbar.container = TOOLBAR_CONFIG;
+    }
     super(quill, options);
     this.quill.container.classList.add('ql-snow');
   }
@@ -24,19 +34,10 @@ class SnowTheme extends BaseTheme {
     }
   }
 }
-SnowTheme.DEFAULTS = {
+SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
   modules: {
     toolbar: {
-      container: [
-        [{ header: ['1', '2', '3', false] }],
-        ['bold', 'italic', 'underline', 'link'],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        ['clean']
-      ],
       handlers: {
-        formula: function(value) {
-          this.quill.theme.tooltip.edit('formula');
-        },
         link: function(value) {
           if (value) {
             let range = this.quill.getSelection();
@@ -50,17 +51,14 @@ SnowTheme.DEFAULTS = {
           } else {
             this.quill.format('link', false);
           }
-        },
-        video: function(value) {
-          this.quill.theme.tooltip.edit('video');
         }
       }
     }
   }
-}
+});
 
 
-class SnowTooltip extends Tooltip {
+class SnowTooltip extends BaseTooltip {
   constructor(quill, bounds) {
     super(quill, bounds);
     this.preview = this.root.querySelector('a.ql-preview');
@@ -74,13 +72,15 @@ class SnowTooltip extends Tooltip {
       } else {
         this.edit('link', this.preview.textContent);
       }
+      event.preventDefault();
     });
     this.root.querySelector('a.ql-remove').addEventListener('click', (event) => {
       if (this.linkRange != null) {
-        this.quill.focus();
+        this.restoreFocus();
         this.quill.formatText(this.linkRange, 'link', false, Emitter.sources.USER);
         delete this.linkRange;
       }
+      event.preventDefault();
       this.hide();
     });
     this.quill.on(Emitter.events.SELECTION_CHANGE, (range) => {
@@ -100,10 +100,17 @@ class SnowTooltip extends Tooltip {
       this.hide();
     });
   }
+
+  show() {
+    super.show();
+    if (this.root.dataset.mode) {
+      delete this.root.dataset.mode;
+    }
+  }
 }
 SnowTooltip.TEMPLATE = [
   '<a class="ql-preview" target="_blank" href="about:blank"></a>',
-  '<input type="text" data-formula-holder="e=mc^2" data-link-holder="quilljs.com" data-video-holder="Embed URL">',
+  '<input type="text" data-formula="e=mc^2" data-link="quilljs.com" data-video="Embed URL">',
   '<a class="ql-action"></a>',
   '<a class="ql-remove"></a>'
 ].join('');

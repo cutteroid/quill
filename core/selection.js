@@ -31,13 +31,6 @@ class Selection {
         setTimeout(this.update.bind(this, Emitter.sources.USER), 100);
       });
     });
-    let scrollTop = this.root.scrollTop;
-    this.root.addEventListener('blur', () => {
-      scrollTop = this.root.scrollTop;
-    });
-    this.root.addEventListener('focus', () => {
-      this.root.scrollTop = scrollTop;
-    });
     this.emitter.on(Emitter.events.EDITOR_CHANGE, (type, delta) => {
       if (type === Emitter.events.TEXT_CHANGE && delta.length() > 0) {
         this.update(Emitter.sources.SILENT);
@@ -59,7 +52,9 @@ class Selection {
 
   focus() {
     if (this.hasFocus()) return;
+    let bodyTop = document.body.scrollTop;
     this.root.focus();
+    document.body.scrollTop = bodyTop;
     this.setRange(this.savedRange);
   }
 
@@ -113,11 +108,7 @@ class Selection {
         }
         var rect = range.getBoundingClientRect();
       } else {
-        if (leaf instanceof BreakBlot) {
-          var rect = leaf.parent.domNode.getBoundingClientRect();
-        } else {
-          var rect = leaf.domNode.getBoundingClientRect();
-        }
+        var rect = leaf.domNode.getBoundingClientRect();
         if (offset > 0) side = 'right';
       }
       bounds = {
@@ -204,15 +195,15 @@ class Selection {
     let bounds = this.getBounds(range.index, range.length);
     if (bounds == null) return;
     if (this.root.offsetHeight < bounds.bottom) {
-      let [line, offset] = this.scroll.line(range.index + range.length);
+      let [line, ] = this.scroll.line(range.index + range.length);
       this.root.scrollTop = line.domNode.offsetTop + line.domNode.offsetHeight - this.root.offsetHeight;
     } else if (bounds.top < 0) {
-      let [line, offset] = this.scroll.line(range.index);
+      let [line, ] = this.scroll.line(range.index);
       this.root.scrollTop = line.domNode.offsetTop;
     }
   }
 
-  setNativeRange(startNode, startOffset, endNode = startNode, endOffset = startOffset) {
+  setNativeRange(startNode, startOffset, endNode = startNode, endOffset = startOffset, force = false) {
     debug.info('setNativeRange', startNode, startOffset, endNode, endOffset);
     if (startNode != null && (this.root.parentNode == null || startNode.parentNode == null || endNode.parentNode == null)) {
       return;
@@ -222,7 +213,7 @@ class Selection {
     if (startNode != null) {
       if (!this.hasFocus()) this.root.focus();
       let nativeRange = this.getNativeRange();
-      if (nativeRange == null ||
+      if (nativeRange == null || force ||
           startNode !== nativeRange.start.node || startOffset !== nativeRange.start.offset ||
           endNode !== nativeRange.end.node || endOffset !== nativeRange.end.offset) {
         let range = document.createRange();
@@ -238,7 +229,11 @@ class Selection {
     }
   }
 
-  setRange(range, source = Emitter.sources.API) {
+  setRange(range, force = false, source = Emitter.sources.API) {
+    if (typeof force === 'string') {
+      source = force;
+      force = false;
+    }
     debug.info('setRange', range);
     if (range != null) {
       let indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
@@ -250,7 +245,10 @@ class Selection {
         [node, offset] = leaf.position(offset, i !== 0);
         args.push(node, offset);
       });
-      this.setNativeRange(...args);
+      if (args.length < 2) {
+        args = args.concat(args);
+      }
+      this.setNativeRange(...args, force);
     } else {
       this.setNativeRange(null);
     }
