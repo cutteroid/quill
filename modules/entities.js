@@ -404,7 +404,7 @@ class Entities extends Module {
 				this.createDomNode(index, eData, true);
 				dz = null;
 
-			} catch (e) { console.debug(e) }
+			} catch (e) { }
 		}
 
 		window.__dragData = null;

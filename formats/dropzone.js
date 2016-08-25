@@ -13,12 +13,6 @@ class DropZone extends Embed {
 		return undefined;
 	}
 
-	remove() {
-		console.debug('remove');
-		super.remove();
-		this.parent = null;
-	}
-
 	length() {
 		return this._length;
 	}
