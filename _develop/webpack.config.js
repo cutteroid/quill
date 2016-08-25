@@ -17,7 +17,7 @@ var constantPack = new webpack.DefinePlugin({
 module.exports = {
   context: path.resolve(__dirname, '..'),
   entry: {
-    'quill': ['./custom.js'],
+    'quill': ['./quill.js'],
     'quill.core': [
       './core.js'
     ],
