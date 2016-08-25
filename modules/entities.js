@@ -9,6 +9,8 @@ class Entities extends Module {
 
 		super(quill, options);
 
+		var _this = this;
+
 		this.selection = this.quill.selection;
 		this.document = this.quill.root.ownerDocument;
 		this.dzID = "dropZone";
@@ -21,7 +23,7 @@ class Entities extends Module {
 		this.listen();
 
 		this.quill.on('CONTENTS-CHANGE', function(node) {
-			zEditor.Entity.initRefresh(node);
+			_this.initRefresh(node);
 		});
 	}
 
@@ -64,7 +66,7 @@ class Entities extends Module {
 			if (_this.entityPopup) _this.processPopupKeys(evt);
 
 			_this.fixCaretPosition(evt);
-			zEditor.Entity.removeTooltips();
+			_this.removeTooltips();
 		});
 
 		this.quill.root.addEventListener('keyup', function(evt) {
@@ -343,7 +345,7 @@ class Entities extends Module {
 				;
 
 				if ( evtData && !dz ) {
-					var dz = this.document.createElement('span');
+					var dz = this.document.createElement('div');
 					dz.setAttribute( 'id', this.dzID );
 					dz.classList.add('dropZone');
 				}
@@ -383,7 +385,7 @@ class Entities extends Module {
 		var
 			dz = this.quill.root.querySelector('#' + this.dzID),
 			dragData = window.__dragData,
-			eData = (dragData)? zEditor.Entity.getEntityData(dragData.uid) : null
+			eData = (dragData)? zEditor.Utils.getEntityData(dragData.uid) : null
 		;
 
 		evt.preventDefault();
@@ -402,7 +404,7 @@ class Entities extends Module {
 				this.createDomNode(index, eData, true);
 				dz = null;
 
-			} catch (e) { }
+			} catch (e) { console.debug(e) }
 		}
 
 		window.__dragData = null;
@@ -415,7 +417,7 @@ class Entities extends Module {
 			cont = (range && range.commonAncestorContainer)? range.commonAncestorContainer : null
 		;
 
-		if (!cont) {
+		if (!cont || !cont.__blot) {
 			return false;
 		}
 
@@ -490,7 +492,7 @@ class Entities extends Module {
 		if (data)
 			this.hidePopups();
 		else
-			zEditor.Entity.listAddItem(obj);
+			zEditor.Utils.listAddItem(obj);
 
 		if (evt) evt.preventDefault();
 	}
@@ -504,7 +506,7 @@ class Entities extends Module {
 
 		var
 			uid = node.getAttribute('uid'),
-			data = zEditor.Entity.getEntityData(uid),
+			data = zEditor.Utils.getEntityData(uid),
 			range = this.quill.selection.getRange()[0];
 		;
 
@@ -657,13 +659,8 @@ class Entities extends Module {
 
 		var
 			coords = {},
-			range = this.getRange()
-			container = this.quill.root;
-			// rBody = document.body.getBoundingClientRect(),
-			// rPopup, xDelta, yDelta,
-
-			// yOffset = 20,
-			// xOffset = 5
+			range = this.getRange(),
+			container = this.quill.root
 		;
 
 		if (!popup || range.index == null)
@@ -676,19 +673,6 @@ class Entities extends Module {
 
 		popup.style.left = coords.x + 'px';
 		popup.style.top = coords.y + 'px';
-
-		// rPopup = popup.getBoundingClientRect();
-
-		// xDelta = rBody.right - rBody.left - rPopup.right;
-		// yDelta = rBody.bottom - rBody.top - rPopup.bottom;
-
-		// utils.removeClass(popup, 'fixTop');
-
-		// if (!filter && xDelta < 0) popup.style.left = Math.max( 0, coords.x + xDelta - xOffset) + "px";
-		// if (yDelta < 0) {
-		// 	popup.style.top = (coords.y - yOffset) + 'px';
-		// 	utils.addClass(popup, 'fixTop');
-		// }
 	}
 
 	getSelectedSuggest(node) {
@@ -955,6 +939,24 @@ class Entities extends Module {
 		this.quill.selection.setRange(new Range(offset + text.length, 0));
 
 		popup.parentNode.removeChild(popup);
+	}
+
+	removeTooltips() {
+		var tooltips = document.querySelectorAll('.entityTooltip');
+		var editors = document.querySelectorAll('.editorTooltipActivator');
+
+		for (var i = 0; i < tooltips.length; i++) {
+			tooltips[i].parentNode.removeChild(tooltips[i]);
+		}
+		for (var j = 0; j < editors.length; j++) {
+			editors[j].classList.remove('editorTooltipActivator');
+		}
+	}
+
+	initRefresh() {
+		var editorNode = this.quill.root;
+		var container = z.getParentNode(editorNode, '.editorsContainer');
+		z.dispatch( { e: "refreshEntityData", f: container, p: "parent", data: { editor: true } } );
 	}
 }
 

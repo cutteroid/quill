@@ -92,7 +92,7 @@ class Toolbar extends Module {
       this.quill.focus();
       let [range, ] = this.quill.selection.getRange();
       if (this.handlers[format] != null) {
-        this.handlers[format].call(this, value);
+        this.handlers[format].call(this, value, e);
       } else if (Parchment.query(format).prototype instanceof Parchment.Embed) {
         value = prompt(`Enter ${format}`);
         if (!value) return;
@@ -254,8 +254,6 @@ Toolbar.DEFAULTS = {
       this.quill.entities.openLinkDialog(evt);
     },
     image: function(value, evt) {
-      // zEditor.Entity.hidePopups(this.quill.root.parentNode);
-      console.debug(this.quill);
       this.quill.images.openImagePanel(evt);
     },
     fullscreen: function(value, evt) {

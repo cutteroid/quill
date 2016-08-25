@@ -13,10 +13,14 @@ import Underline from './formats/underline';
 import Toolbar from './modules/toolbar';
 
 import Entities from './modules/entities';
+import ObjectNode from './formats/objectnode';
+import ObjectLink from './formats/objectlink';
 
 import Images from './modules/images';
 import ObjectImage from './formats/objectimage';
 
+import Filler from './formats/filler';
+import DropZone from './formats/dropzone';
 
 import SnowTheme from './themes/snow';
 
@@ -32,6 +36,13 @@ Quill.register({
   'formats/underline': Underline,
 
   'formats/list/item': ListItem,
+
+  'formats/objectimage': ObjectImage,
+  'formats/objectlink': ObjectLink,
+  'formats/objectnode': ObjectNode,
+  'formats/dropzone': DropZone,
+  'formats/filler': Filler,
+
 
   'modules/toolbar': Toolbar,
   'modules/images': Images,

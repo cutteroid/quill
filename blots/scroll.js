@@ -116,7 +116,9 @@ class Scroll extends Parchment.Scroll {
     if (mutations.length > 0) {
       this.emitter.emit(Emitter.events.SCROLL_BEFORE_UPDATE, source, mutations);
     }
-    super.update(mutations.concat([]));   // pass copy
+    try { // super.update sometimes crashing with `Uncaught TypeError: Cannot read property 'mutations' of undefined` on child blots
+      super.update(mutations.concat([]));   // pass copy
+    } catch(e) {}
     if (mutations.length > 0) {
       this.emitter.emit(Emitter.events.SCROLL_UPDATE, source, mutations);
     }
@@ -127,6 +129,5 @@ Scroll.className = 'ql-editor';
 Scroll.tagName = 'DIV';
 Scroll.defaultChild = 'block';
 Scroll.allowedChildren = [Block, BlockEmbed, Container];
-
 
 export default Scroll;

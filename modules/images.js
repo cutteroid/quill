@@ -55,7 +55,6 @@ class Images extends Module {
 			container = this.quill.root.parentNode,
 			eTarget = evt.target
 		;
-
 		if (this.openedPanel) {
 			this.openedPanel.parentNode.removeChild(this.openedPanel);
 			this.openedPanel.button.classList.remove('active');
@@ -63,6 +62,7 @@ class Images extends Module {
 			return;
 		}
 
+		this.quill.entities.hidePopups();
 		z.dispatch(	{ e: "collectImagesData", f: target, p: ".attachmentRow", data: data } );
 
 		tmpFragment.appendChild(tmpNode);

@@ -59,6 +59,16 @@ class Quill {
       Quill.debug(options.debug);
     }
 
+    this.alias = options.alias;
+
+    try { // object nodes cleanup hack
+      var nodeList = this.container.querySelectorAll('.objectImage,.objectNode');
+      for (var i = 0; i < nodeList.length; i++) {
+        var iNode = nodeList[i];
+        iNode.innerHTML = '';
+      }
+    } catch (e) { }
+
     let html = this.container.innerHTML.trim();
     this.container.classList.add('editorContainer');
     this.container.innerHTML = '';
@@ -89,6 +99,8 @@ class Quill {
     this.emitter.on(Emitter.events.TEXT_CHANGE, (delta) => {
       this.root.classList.toggle('isBlank', this.editor.isBlank());
     });
+
+    this.root.parentNode._editor = this;
   }
 
   addContainer(container, refNode = null) {
@@ -296,6 +308,7 @@ class Quill {
       range = shiftRange(range, change, source);
       this.setSelection(range, Emitter.sources.SILENT);
     }
+    this.emitter.emit('CONTENTS-CHANGE', this.root);
     return change;
   }
 
@@ -316,7 +329,8 @@ Quill.DEFAULTS = {
   modules: {},
   placeholder: '',
   readOnly: false,
-  theme: 'default'
+  theme: 'default',
+  alias: ''
 };
 Quill.events = Emitter.events;
 Quill.sources = Emitter.sources;

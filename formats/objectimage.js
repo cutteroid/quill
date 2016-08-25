@@ -2,7 +2,8 @@ import Embed from '../blots/embed';
 
 class ObjectImage extends Embed {
 
-	create(value) {
+	static create(value) {
+
 		var
 			tmpFragment = document.createDocumentFragment(),
 			tmpNode = document.createElement('div'),
@@ -11,7 +12,7 @@ class ObjectImage extends Embed {
 
 		// this.NotEditable = true;
 
-		if (!value.height) value.height = zEditor.Modules.Images.minImageHeight;
+		if (!value.height) value.height = 150;
 
 		tmpFragment.appendChild(tmpNode);
 		z.template( tmpE, ["reportForm_imageObjectNode", "add"] );
@@ -26,18 +27,18 @@ class ObjectImage extends Embed {
 		}
 
 		node.addEventListener('mouseup', function(evt) {
-			zEditor.Entity.handleImageClick(evt, this);
+			zEditor.Utils.handleImageClick(evt, this);
 		});
 
 		var resizer = node.querySelector('.resizeBar');
 		resizer.addEventListener('mousedown', function(evt) {
-			zEditor.Entity.handleImageResize(evt, this);
+			zEditor.Utils.handleImageResize(evt, this);
 		});
 
 		return node;
 	}
 
-	value(domNode) {
+	static value(domNode) {
 		var format =
 			{
 				"preview": domNode.getAttribute('preview'),
