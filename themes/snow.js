@@ -21,11 +21,11 @@ class SnowTheme extends BaseTheme {
   }
 
   extendToolbar(toolbar) {
-    if (toolbar.container.querySelector('.ql-link')) {
-      this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
-        toolbar.handlers['link'].call(toolbar, !context.format.link);
-      });
-    }
+    // if (toolbar.container.querySelector('.ql-link')) {
+    //   this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
+    //     toolbar.handlers['link'].call(toolbar, !context.format.link);
+    //   });
+    // }
   }
 }
 SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {

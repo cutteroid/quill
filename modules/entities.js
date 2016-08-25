@@ -835,9 +835,11 @@ class Entities extends Module {
 			data = { type: "link" },
 			tmpE = { c: this.quill.root.parentNode, data: data },
 
-			popup, x, y, target, xOffset,
+			popup, x, y, target, xOffset, yOffset, isButton,
 			selectedText = ''
 		;
+
+		this.quill.entities.hidePopups();
 
 		if (blot) {
 			target = blot.domNode;
@@ -862,7 +864,7 @@ class Entities extends Module {
 		}
 
 		if (blot) {
-			var format = blot.formats().objectlink;
+			var format = blot.value().objectlink;
 			data.text = format.text;
 			data.url = format.original;
 			data.edit = true;
@@ -919,8 +921,11 @@ class Entities extends Module {
 
 		var linkLength = data.text.length;
 		if (linkLength > 0) {
-			this.quill.insertText(range.index, data.text, 'objectlink', data, Emitter.sources.USER);
-			this.quill.selection.setRange(new Range(range.index + linkLength, 0));
+			// this.quill.focus();
+			if (blot) blot.remove();
+			this.quill.insertEmbed(range.index, 'objectlink', data, Emitter.sources.USER);
+			// this.quill.insertText(range.index, data.text, 'objectlink', data, Emitter.sources.USER);
+			this.quill.selection.setRange(new Range(range.index + 1, 0));
 		}
 
 		popup.parentNode.removeChild(popup);
@@ -928,12 +933,12 @@ class Entities extends Module {
 
 	handleLinkRemove(popup, blot) {
 		var offset = blot.offset(this.quill.root);
-		var format = blot.formats().objectlink;
+		var format = blot.value().objectlink;
 		var text = format.text;
 
 		text = text.split(this.spacer).join('');
 
-		this.quill.deleteText(offset, format.length, Emitter.sources.USER);
+		blot.remove();
 		this.quill.insertText(offset, text, Emitter.sources.USER);
 
 		this.quill.selection.setRange(new Range(offset + text.length, 0));

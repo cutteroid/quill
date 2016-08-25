@@ -1,12 +1,12 @@
 import Inline from '../blots/inline';
-import Cursor from '../blots/cursor';
-import Text from '../blots/text';
+import Embed from '../blots/embed';
 
-class ObjectLink extends Inline {
+class ObjectLink extends Embed {
 
 	constructor(domNode) {
 		super(domNode);
 		this.NotEditable = true;
+		this._length = 1;
 	}
 
 	static create(value) {
@@ -16,10 +16,11 @@ class ObjectLink extends Inline {
 		node.setAttribute('target', '_blank');
 		node.setAttribute('title', value.text);
 		node.setAttribute('contenteditable', 'false');
+		node.textContent = value.text;
 		return node;
 	}
 
-	static formats(domNode) {
+	static value(domNode) {
 		var format = {
 			"min": domNode.getAttribute('href'),
 			"original": domNode.getAttribute('original'),
@@ -30,23 +31,12 @@ class ObjectLink extends Inline {
 		return format;
 	}
 
-	insertAt() {
-		return false;
-	}
-
-	deleteAt() {
-		return false;
-	}
-
-	formatAt() {
-		return false;
-	}
+	length() { return 1; }
 }
 
 ObjectLink.blotName = 'objectlink';
 ObjectLink.tagName = 'A';
 ObjectLink.className = 'objectLink';
-ObjectLink.allowedChildren = [ Text, Cursor ];
 
 export default ObjectLink;
 
