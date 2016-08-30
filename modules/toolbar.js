@@ -123,7 +123,7 @@ class Toolbar extends Module {
         } else if (!Array.isArray(formats[format])) {
           let value = formats[format];
           if (typeof value === 'string') {
-            value = value.replace(/\"/g, '&quot;');
+            value = value.replace(/\"/g, '\\"');
           }
           option = input.querySelector(`option[value="${value}"]`);
         }
@@ -139,7 +139,10 @@ class Toolbar extends Module {
         } else if (input.hasAttribute('value')) {
           // both being null should match (default values)
           // '1' should match with 1 (headers)
-          input.classList.toggle('ql-active', formats[format] == input.value || (formats[format] == null && !input.value));
+          let isActive = formats[format] === input.getAttribute('value') ||
+                         (formats[format] != null && formats[format].toString() === input.getAttribute('value')) ||
+                         (formats[format] == null && !input.getAttribute('value'));
+          input.classList.toggle('ql-active', isActive);
         } else {
           input.classList.toggle('ql-active', formats[format] != null);
         }
