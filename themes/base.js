@@ -20,7 +20,6 @@ const HEADERS = [ '1', '2', '3', false ];
 
 const SIZES = [ 'small', false, 'large', 'huge' ];
 
-
 class BaseTheme extends Theme {
   constructor(quill, options) {
     super(quill, options);

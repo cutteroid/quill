@@ -1,7 +1,6 @@
 import extend from 'extend';
 import Emitter from '../core/emitter';
 import BaseTheme from './base';
-import LinkBlot from '../formats/link';
 
 import { Range } from '../core/selection';
 
@@ -35,6 +34,5 @@ SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
     }
   }
 });
-
 
 export default SnowTheme;

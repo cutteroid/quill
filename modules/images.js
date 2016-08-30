@@ -55,10 +55,9 @@ class Images extends Module {
 			container = this.quill.root.parentNode,
 			eTarget = evt.target
 		;
+
 		if (this.openedPanel) {
-			this.openedPanel.parentNode.removeChild(this.openedPanel);
-			this.openedPanel.button.classList.remove('active');
-			this.openedPanel = null;
+			this.closeImagePanel();
 			return;
 		}
 
@@ -106,13 +105,17 @@ class Images extends Module {
 			range = this.getRange();
 			this.quill.insertEmbed(range.index, 'objectimage', data, Emitter.sources.USER);
 			if (this.openedPanel) {
-				this.openedPanel.parentNode.removeChild(this.openedPanel);
-				this.openedPanel.button.classList.remove('active');
-				this.openedPanel = null;
+				this.closeImagePanel();
 			}
 		} catch (e) { }
 
 		return;
+	}
+
+	closeImagePanel() {
+		this.openedPanel.parentNode.removeChild(this.openedPanel);
+		this.openedPanel.button.classList.remove('active');
+		this.openedPanel = null;
 	}
 
 	openImageTools(evt, imgNode) {

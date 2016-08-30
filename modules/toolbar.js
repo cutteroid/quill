@@ -125,7 +125,7 @@ class Toolbar extends Module {
         } else if (!Array.isArray(formats[format])) {
           let value = formats[format];
           if (typeof value === 'string') {
-            value = value.replace(/\"/g, '&quot;');
+            value = value.replace(/\"/g, '\\"');
           }
           option = input.querySelector(`option[value="${value}"]`);
         }
@@ -138,17 +138,24 @@ class Toolbar extends Module {
       } else {
         if (range == null) {
           input.classList.remove('active');
+          if (images.openedPanel != null) {
+            images.closeImagePanel();
+          }
         } else if (input.hasAttribute('type')) {
           // both being null should match (default values)
           // '1' should match with 1 (headers)
+
           let type = input.getAttribute('type');
-          let active = formats[format] == type || (formats[format] == null && !type)
-          input.classList.toggle('active', active);
+          let isActive = formats[format] === type ||
+                         (formats[format] != null && formats[format].toString() === type) ||
+                         (formats[format] == null && !type);
+
+          input.classList.toggle('active', isActive);
         } else {
-          let active = formats[format] != null;
-          if (format === 'image' && images && images.openedPanel != null) active = true;
-          if (format === 'fullscreen' && body.classList.contains('fullscreenEditor')) active = true;
-          input.classList.toggle('active', active);
+          let isActive = formats[format] != null;
+          if (format === 'image' && images && images.openedPanel != null) isActive = true;
+          if (format === 'fullscreen' && body.classList.contains('fullscreenEditor')) isActive = true;
+          input.classList.toggle('active', isActive);
         }
       }
     });
@@ -250,7 +257,6 @@ Toolbar.DEFAULTS = {
       }
     },
     link: function(value, evt) {
-      // zEditor.Entity.hidePopups(this.quill.root.parentNode);
       this.quill.entities.openLinkDialog(evt);
     },
     image: function(value, evt) {
