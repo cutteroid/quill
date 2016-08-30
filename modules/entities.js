@@ -524,7 +524,7 @@ class Entities extends Module {
 			cont = this.createEntityPopup(isSub)
 		;
 
-		popup = cont.querySelector('.editorSuggest');
+		popup = (cont)? cont.querySelector('.editorSuggest') : null;
 
 		if (!popup)
 			return false;
@@ -565,6 +565,9 @@ class Entities extends Module {
 		}
 
 		z.dispatch( { e: event, f: list, p: propagation, data: popupData } );
+
+		if (!popupData.entities || !popupData.entities.length)
+			return null;
 
 		if (this.entityPopup)
 			this.entityPopup.parentNode.removeChild(this.entityPopup);

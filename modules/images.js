@@ -63,14 +63,15 @@ class Images extends Module {
 		}
 
 		this.quill.entities.hidePopups();
-		z.dispatch(	{ e: "collectImagesData", f: target, p: ".attachmentRow", data: data } );
+		z.dispatch(	{ e: "collectImagesData", f: target, p: ".filePreview", data: data } );
 
 		tmpFragment.appendChild(tmpNode);
-		z.template( tmpE, ["reportForm_editorImageList", "add"] );
+		z.template( tmpE, ["reportForm_editorImagePanel", "add"] );
 
 		var list = tmpNode.querySelector('.editorImagesPanel');
 		container.parentNode.insertBefore(list, container);
 
+		list._editor = this.quill;
 		this.openedPanel = list;
 
 		if (!eTarget.classList.contains('button'))
@@ -79,24 +80,24 @@ class Images extends Module {
 		this.openedPanel.button = eTarget;
 		eTarget.classList.add('active');
 
-		var images = list.querySelectorAll('.imageBox');
+		var images = list.querySelectorAll('.imageBox[style]');
 
 		var _this = this;
-		for (var i = 0; i < images.length; i++) {
-			(function(img){
-				img.addEventListener('click', function(evt) {
-					_this.handleImageAdd(img);
-				});
-			})(images[i]);
-		}
+		list.addEventListener('click', function(evt) {
+			_this.handleImageAdd(evt);
+		});
 	}
 
-	handleImageAdd(image) {
+	handleImageAdd(event) {
 
 		var
 			data = {},
-			range
+			range,
+			image = event.target
 		;
+
+		if (!image.classList.contains('imageBox') || !image.hasAttribute('style'))
+			return;
 
 		z.dispatch(	{ e: "collectAsObj", f: image, p: "HIDDEN", data: data } );
 
@@ -108,9 +109,10 @@ class Images extends Module {
 				this.openedPanel.parentNode.removeChild(this.openedPanel);
 				this.openedPanel.button.classList.remove('active');
 				this.openedPanel = null;
-				return;
 			}
 		} catch (e) { }
+
+		return;
 	}
 
 	openImageTools(evt, imgNode) {
