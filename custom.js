@@ -24,6 +24,8 @@ import DropZone from './formats/dropzone';
 
 import SnowTheme from './themes/snow';
 
+import PasteFromWord from './modules/word';
+
 Quill.register({
   'formats/indent': Indent,
 
@@ -43,7 +45,7 @@ Quill.register({
   'formats/dropzone': DropZone,
   'formats/filler': Filler,
 
-
+  'modules/word': PasteFromWord,
   'modules/toolbar': Toolbar,
   'modules/images': Images,
   'modules/entities': Entities,

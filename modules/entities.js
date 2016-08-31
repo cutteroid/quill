@@ -22,9 +22,22 @@ class Entities extends Module {
 
 		this.listen();
 
+		this.quill.clipboard.preprocess.push(this.cleanObjectNodes);
+
 		this.quill.on('CONTENTS-CHANGE', function(node) {
 			_this.initRefresh(node);
 		});
+	}
+
+	cleanObjectNodes(container) {
+		try { // object nodes cleanup
+			var nodeList = container.querySelectorAll('.objectImage,.objectNode');
+
+			for (var i = 0; i < nodeList.length; i++) {
+				var iNode = nodeList[i];
+				iNode.innerHTML = '';
+			}
+		} catch (e) { }
 	}
 
 	getRange() {
@@ -109,7 +122,7 @@ class Entities extends Module {
 
 		var
 			downArr = [37, 39],
-			blacklist = [16, 17, 18, 91, 224],
+			blacklist = [16, 17, 18, 48, 91, 224],
 			key = evt.which || evt.keyCode || 0,
 			type = evt.type,
 			range = this.getRange(),

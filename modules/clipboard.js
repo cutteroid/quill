@@ -47,6 +47,7 @@ class Clipboard extends Module {
     this.container.setAttribute('contenteditable', true);
     this.container.setAttribute('tabindex', -1);
     this.matchers = [];
+    this.preprocess = [];
     CLIPBOARD_CONFIG.concat(this.options.matchers).forEach((pair) => {
       this.addMatcher(...pair);
     });
@@ -56,11 +57,21 @@ class Clipboard extends Module {
     this.matchers.push([selector, matcher]);
   }
 
+  doPreprocess() {
+    for (var i = 0; i < this.preprocess.length; i++) {
+      this.preprocess[i](this.container, this.quill);
+    }
+  }
+
   convert(html) {
+
     const DOM_KEY = '__ql-matcher';
     if (typeof html === 'string') {
       this.container.innerHTML = html;
     }
+
+    this.doPreprocess();
+
     let textMatchers = [], elementMatchers = [];
     this.matchers.forEach((pair) => {
       let [selector, matcher] = pair;

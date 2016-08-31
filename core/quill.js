@@ -61,14 +61,6 @@ class Quill {
 
     this.alias = options.alias;
 
-    try { // object nodes cleanup hack
-      var nodeList = this.container.querySelectorAll('.objectImage,.objectNode');
-      for (var i = 0; i < nodeList.length; i++) {
-        var iNode = nodeList[i];
-        iNode.innerHTML = '';
-      }
-    } catch (e) { }
-
     let html = this.container.innerHTML.trim();
     this.container.classList.add('editorContainer');
     this.container.innerHTML = '';
@@ -81,11 +73,12 @@ class Quill {
     this.editor = new Editor(this.scroll, this.emitter);
     this.selection = new Selection(this.scroll, this.emitter);
     this.theme = new options.theme(this, options);
+    this.clipboard = this.theme.addModule('clipboard');
     this.images = this.theme.addModule('images');
     this.entities = this.theme.addModule('entities');
     this.keyboard = this.theme.addModule('keyboard');
-    this.clipboard = this.theme.addModule('clipboard');
     this.history = this.theme.addModule('history');
+    this.word = this.theme.addModule('word');
     this.theme.init();
     this.pasteHTML(`<div class='editable' style="white-space: normal;">${html}<p><br></p></div>`);
     this.history.clear();
