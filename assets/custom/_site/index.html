@@ -4,6 +4,7 @@
 	<title>Test</title>
 	<link rel="stylesheet" href="style.css" />
 
+	<script type="text/javascript" src="http://localhost:8080/js/main.js"></script>
 	<script type="text/javascript" src="http://192.168.154.1:8080/js/main.js"></script>
 
 	<style>
@@ -21,7 +22,19 @@
 <body>
 
 	<div class="standalone-container tabContent">
-		<div id="snow-container">lorem <b>ipsum</b></div>
+		<div id="snow-container">
+			<ol>
+				<li>one</li>
+				<li>
+					<b>two</b>
+					<ul>
+						<li>unordered</li>
+						<li>unordered</li>
+					</ul>
+				</li>
+				<li>three</li>
+			</ol>
+		</div>
 	</div>
 
 	<script type="text/javascript" src="/1.0.0-rc.2/quill.custom.js"></script>

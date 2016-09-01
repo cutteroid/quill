@@ -78,7 +78,7 @@ class Quill {
     this.entities = this.theme.addModule('entities');
     this.keyboard = this.theme.addModule('keyboard');
     this.history = this.theme.addModule('history');
-    this.word = this.theme.addModule('word');
+    this.cleanpaste = this.theme.addModule('cleanpaste');
     this.theme.init();
     this.pasteHTML(`<div class='editable' style="white-space: normal;">${html}<p><br></p></div>`);
     this.history.clear();

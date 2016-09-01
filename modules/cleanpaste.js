@@ -1,26 +1,126 @@
 import Module from '../core/module';
 
-class PasteFromWord extends Module {
+class CleanPaste extends Module {
 
 	constructor(quill, options) {
 
 		super(quill, options);
 
-		this.TEXT_NODE = 3;
+		this.TXT_NODE = 3;
+
 		var _this = this;
 
-		this.quill.clipboard.preprocess.push(_this.cleanHTML);
+		this.quill.clipboard.preprocess.push(_this.cleanPasteData);
 	}
 
-	cleanHTML(container, quill) {
-		console.debug('cleanhtml',container.innerHTML);
-		if (quill.word.isCleanNeeded(container.innerHTML)) {
-			quill.word.cleanUp(container);
+	cleanPasteData(container, quill) {
+		var _this = quill.cleanpaste;
+
+		var
+			data = container.innerHTML,
+			stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g,
+			commentSripper = new RegExp('<!--(.*?)-->','g'),
+			tagStripper = new RegExp('<(/)*(meta|link|\\?xml:|st1:|o:|nobr|img|font|code|pre|cite|hr|nav|header|footer|article|section|table|td|th|tbody|thead|tfoot|strike|del|kbd|wbr|bdi|small|time)(.*?)>','gi'),
+			badTags = ['style', 'script','applet','embed','noframes','noscript', 'form', 'iframe', 'button'],
+			badAttributes = ['style', 'start', 'align'],
+
+			repeatParagraphs = function( repeats ) {
+					var times = ~~( repeats / 2 );
+					return new Array( times + 1 ).join( '</p><p>' ) + ( repeats % 2 == 1 ? '<br>' : '' );
+			}
+		;
+
+		if (!data || data == '')
+			return;
+
+		if (_this.isWordCleanNeeded(data)) {
+			quill.cleanpaste.cleanUpWordStuff(container);
 		}
+
+		var nodes = container.querySelectorAll('*');
+		if ( nodes.length ) {
+			for( var i = 0; i < nodes.length; i++ ) {
+				var	node = nodes[i], nodeName = node.nodeName.toUpperCase();
+
+				if ( node && node.parentNode ) {
+
+					var unwrap = false;
+
+					switch(nodeName) {
+
+						case 'TR':
+							_this.wrapNode(node, 'P');
+							unwrap = true;
+							break;
+
+						case 'LI':
+							var pName = node.parentNode.nodeName.toUpperCase();
+							if (pName && (pName != 'UL' && pName != 'OL')) {
+								node.parentNode.removeChild(node);
+							}
+							break;
+
+						case 'IFRAME':
+							node.parentNode.removeChild(node);
+							unwrap = false;
+							break;
+
+						case 'H1':
+						case 'H2':
+						case 'H3':
+						case 'H4':
+						case 'H5':
+						case 'H6':
+							unwrap = true;
+							_this.wrapNode(node, 'B');
+							_this.wrapNode(node.parentNode, 'P');
+					}
+
+					if (unwrap) {
+						_this.unwrapNode(node);
+					}
+				}
+			}
+		}
+
+		data = container.innerHTML;
+
+		// if ( zEditor.Env.webkit && data.indexOf( '<div>' ) > -1 ) {
+
+		// 	data = data
+		// 		.replace( /^(<div>(<br>|)<\/div>)(?!$|(<div>(<br>|)<\/div>))/g, '<br>' )
+		// 		.replace( /^(<div>(<br>|)<\/div>){2}(?!$)/g, '<div></div>' );
+
+		// 	if ( data.match( /<div>(<br>|)<\/div>/ ) ) {
+		// 		data = '<p>' + data.replace( /(<div>(<br>|)<\/div>)+/g, function( match ) {
+		// 			return repeatParagraphs( match.split( '</div><div>' ).length + 1 );
+		// 		} ) + '</p>';
+		// 	}
+
+		// 	data = data.replace( /<\/div><div>/g, '<br>' );
+		// 	data = data.replace( /<\/?div>/g, '' );
+		// }
+
+		// if ( zEditor.Env.gecko ) {
+
+		// 	data = data.replace( /^<br><br>$/, '<br>' );
+
+		// 	if ( data.indexOf( '<br><br>' ) > -1 ) {
+		// 		data = '<p>' + data.replace( /(<br>){2,}/g, function( match ) {
+		// 			return repeatParagraphs( match.length / 4 );
+		// 		} ) + '</p>';
+		// 	}
+		// }
+
+
+		// console.debug(data);
+		container.innerHTML = data;
+		var tmp = document.createElement('div');
+		tmp.innerHTML = data;
+		console.debug(data);
 	}
 
-	isCleanNeeded(data) {
-		console.debug(data);
+	isWordCleanNeeded(data) {
 		return (
 			( /<font face="Times New Roman"|class="?Mso|style="[^"]*\bmso-|style='[^'']*\bmso-|w:WordDocument/i ).test(data) ||
 			( /class="OutlineElement/ ).test(data) ||
@@ -43,7 +143,7 @@ class PasteFromWord extends Module {
 
 		text = text.replace(/^[\u00a0 ]+/, '');
 
-		forEach(patterns, function(pattern) {
+		this.forEach(patterns, function(pattern) {
 			if (pattern.test(text)) {
 				found = true;
 				return false;
@@ -58,7 +158,7 @@ class PasteFromWord extends Module {
 	};
 
 	filter(content, items) {
-		forEach(items, function(v) {
+		this.forEach(items, function(v) {
 			if (v.constructor == RegExp) {
 				content = content.replace(v, '');
 			} else {
@@ -95,17 +195,17 @@ class PasteFromWord extends Module {
 			return;
 
 		var
-			styles = parseStyle( node.getAttribute('style') ),
+			styles = this.parseStyle( node.getAttribute('style') ),
 			parsedStyles = {}
 		;
 
-		forEach(styles, function(value, name){
+		this.forEach(styles, function(value, name){
 
 			switch(name) {
 
 				case 'mso-list':
 
-					matches = /\w+ \w+([0-9]+)/i.exec(value);
+					var matches = /\w+ \w+([0-9]+)/i.exec(value);
 
 					if (matches) {
 						node._listLevel = parseInt(matches[1], 10);
@@ -120,7 +220,7 @@ class PasteFromWord extends Module {
 				case "mso-element":
 
 					if (/^(comment|comment-list)$/i.test(value)) {
-						node.remove();
+						node.parentNode.removeChild(node);
 						return;
 					}
 					break;
@@ -195,11 +295,11 @@ class PasteFromWord extends Module {
 		}
 
 		if (!href && !name) {
-			unwrapNode(node);
+			this.unwrapNode(node);
 		} else {
 			if (name) {
 				if(!/^_?(?:toc|edn|ftn)/i.test(name)) {
-					unwrapNode(node);
+					this.unwrapNode(node);
 					return;
 				}
 			}
@@ -211,7 +311,7 @@ class PasteFromWord extends Module {
 
 	convertLists(node) {
 
-		var currentListNode, prevListNode, lastLevel = 1;
+		var _this = this.quill.cleanpaste, currentListNode, prevListNode, lastLevel = 1;
 
 		Node.prototype.walk = function(prev) {
 			return walk(this, null, prev);
@@ -245,7 +345,7 @@ class PasteFromWord extends Module {
 		function getText(node) {
 			var txt = '';
 
-			if (node.nodeType === this.TEXT_NODE) {
+			if (node.nodeType === _this.TXT_NODE) {
 				return node.nodeValue;
 			}
 
@@ -259,7 +359,7 @@ class PasteFromWord extends Module {
 		};
 
 		function trimListStart(node, regExp) {
-			if (node.nodeType === this.TEXT_NODE) {
+			if (node.nodeType === _this.TXT_NODE) {
 				if (regExp.test(node.nodeValue)) {
 					node.nodeValue = node.nodeValue.replace(regExp, '');
 					return false;
@@ -315,19 +415,19 @@ class PasteFromWord extends Module {
 					currentListNode.setAttribute('start', '' + start);
 				}
 
-				wrapNode(paragraphNode, currentListNode);
+				_this.wrapNode(paragraphNode, currentListNode);
 
 			} else {
 				currentListNode.appendChild(paragraphNode);
 			}
 
-			wrapNode(paragraphNode, 'li');
+			_this.wrapNode(paragraphNode, 'li');
 
 			var newNode = paragraphNode.parentNode;
 			if ( paragraphNode._listLevel )
 				newNode._listLevel = paragraphNode._listLevel;
 
-			unwrapNode(paragraphNode);
+			_this.unwrapNode(paragraphNode);
 
 			var paragraphNode = newNode;
 
@@ -345,7 +445,7 @@ class PasteFromWord extends Module {
 
 		var elements = [], child = node.firstChild;
 		while (typeof child !== 'undefined' && child !== null) {
-			if( child.nodeType !== this.TEXT_NODE) elements.push(child);
+			if( child.nodeType !== 3) elements.push(child);
 			child = child.walk();
 
 			if (child !== null) {
@@ -365,12 +465,12 @@ class PasteFromWord extends Module {
 			if (nodeName == 'P' && node.firstChild) {
 				var nodeText = getText(node);
 
-				if (isBulletList(nodeText)) {
+				if (this.isBulletList(nodeText)) {
 					convertParagraphToLi(node, 'ul');
 					continue;
 				}
 
-				if (isNumericList(nodeText)) {
+				if (this.isNumericList(nodeText)) {
 
 					var
 						matches = /([0-9]+)\./.exec(nodeText),
@@ -399,11 +499,11 @@ class PasteFromWord extends Module {
 		};
 	};
 
-	cleanUp(container) {
+	cleanUpWordStuff(container) {
 		console.debug('cleanUp');
 		var html = container.innerHTML;
 
-		html = filter(
+		html = this.filter(
 				html,
 				[
 					/<b[^>]+id="?docs-internal-[^>]*>/gi,
@@ -426,15 +526,15 @@ class PasteFromWord extends Module {
 		var nodes = container.querySelectorAll('*');
 		if ( nodes.length ) {
 
-			for( i = 0; i < nodes.length; i++ ) {
+			for( var i = 0; i < nodes.length; i++ ) {
 				var
 					node = nodes[i],
 					nodeName = node.nodeName.toUpperCase(),
 					parsedStyles = {}
 				;
 
-				cleanNodeStyle(node);
-				cleanNodeClass(node);
+				this.cleanNodeStyle(node);
+				this.cleanNodeClass(node);
 
 				if ( node && node.parentNode ) {
 
@@ -442,7 +542,7 @@ class PasteFromWord extends Module {
 
 						case 'SPAN':
 						case 'FONT':
-							unwrapNode(node);
+							this.unwrapNode(node);
 							break;
 
 						case 'DEL':
@@ -450,7 +550,7 @@ class PasteFromWord extends Module {
 							break;
 
 						case 'A':
-							cleanLinkNode(node);
+							this.cleanLinkNode(node);
 							break;
 
 					}
@@ -458,10 +558,9 @@ class PasteFromWord extends Module {
 			}
 		}
 
-		convertLists(container);
-
-		console.debug(container.innerHTML);
+		this.convertLists(container);
 	};
+
 
 	// UTILS
 
@@ -515,7 +614,19 @@ class PasteFromWord extends Module {
 		while (node.firstChild) parent.insertBefore(node.firstChild, node);
 		parent.removeChild(node);
 	}
+
+	filter(content, items) {
+		this.forEach(items, function(v) {
+			if (v.constructor == RegExp) {
+				content = content.replace(v, '');
+			} else {
+				content = content.replace(v[0], v[1]);
+			}
+		});
+
+		return content;
+	};
 }
 
-export default PasteFromWord;
+export default CleanPaste;
 
