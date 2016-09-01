@@ -85,39 +85,34 @@ class CleanPaste extends Module {
 
 		data = container.innerHTML;
 
-		// if ( zEditor.Env.webkit && data.indexOf( '<div>' ) > -1 ) {
+		if ( zEditor.Env.webkit && data.indexOf( '<div>' ) > -1 ) {
 
-		// 	data = data
-		// 		.replace( /^(<div>(<br>|)<\/div>)(?!$|(<div>(<br>|)<\/div>))/g, '<br>' )
-		// 		.replace( /^(<div>(<br>|)<\/div>){2}(?!$)/g, '<div></div>' );
+			data = data
+				.replace( /^(<div>(<br>|)<\/div>)(?!$|(<div>(<br>|)<\/div>))/g, '<br>' )
+				.replace( /^(<div>(<br>|)<\/div>){2}(?!$)/g, '<div></div>' );
 
-		// 	if ( data.match( /<div>(<br>|)<\/div>/ ) ) {
-		// 		data = '<p>' + data.replace( /(<div>(<br>|)<\/div>)+/g, function( match ) {
-		// 			return repeatParagraphs( match.split( '</div><div>' ).length + 1 );
-		// 		} ) + '</p>';
-		// 	}
+			if ( data.match( /<div>(<br>|)<\/div>/ ) ) {
+				data = '<p>' + data.replace( /(<div>(<br>|)<\/div>)+/g, function( match ) {
+					return repeatParagraphs( match.split( '</div><div>' ).length + 1 );
+				} ) + '</p>';
+			}
 
-		// 	data = data.replace( /<\/div><div>/g, '<br>' );
-		// 	data = data.replace( /<\/?div>/g, '' );
-		// }
+			data = data.replace( /<\/div><div>/g, '<br>' );
+			data = data.replace( /<\/?div>/g, '' );
+		}
 
-		// if ( zEditor.Env.gecko ) {
+		if ( zEditor.Env.gecko ) {
 
-		// 	data = data.replace( /^<br><br>$/, '<br>' );
+			data = data.replace( /^<br><br>$/, '<br>' );
 
-		// 	if ( data.indexOf( '<br><br>' ) > -1 ) {
-		// 		data = '<p>' + data.replace( /(<br>){2,}/g, function( match ) {
-		// 			return repeatParagraphs( match.length / 4 );
-		// 		} ) + '</p>';
-		// 	}
-		// }
+			if ( data.indexOf( '<br><br>' ) > -1 ) {
+				data = '<p>' + data.replace( /(<br>){2,}/g, function( match ) {
+					return repeatParagraphs( match.length / 4 );
+				} ) + '</p>';
+			}
+		}
 
-
-		// console.debug(data);
 		container.innerHTML = data;
-		var tmp = document.createElement('div');
-		tmp.innerHTML = data;
-		console.debug(data);
 	}
 
 	isWordCleanNeeded(data) {
@@ -500,7 +495,7 @@ class CleanPaste extends Module {
 	};
 
 	cleanUpWordStuff(container) {
-		console.debug('cleanUp');
+
 		var html = container.innerHTML;
 
 		html = this.filter(
