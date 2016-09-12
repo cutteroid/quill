@@ -2,6 +2,7 @@ import clone from 'clone';
 import equal from 'deep-equal';
 import extend from 'extend';
 import Delta from 'rich-text/lib/delta';
+import DeltaOp from 'rich-text/lib/op';
 import Parchment from 'parchment';
 import Quill from '../core/quill';
 import logger from '../core/logger';
@@ -35,9 +36,19 @@ class Keyboard extends Module {
     });
     this.addBinding({ key: Keyboard.keys.ENTER, shiftKey: null }, handleEnter);
     this.addBinding({ key: Keyboard.keys.ENTER, metaKey: null, ctrlKey: null, altKey: null }, function() {});
-    this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true, prefix: /^.?$/ }, function(range) {
+    this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true, prefix: /^.?$/ }, function(range, context) {
       if (range.index === 0) return;
-      this.quill.deleteText(range.index - 1, 1, Quill.sources.USER);
+      let [line, ] = this.quill.scroll.line(range.index);
+      let formats = {};
+      if (context.offset === 0) {
+        let curFormats = line.formats();
+        let prevFormats = this.quill.getFormat(range.index-1, 1);
+        formats = DeltaOp.attributes.diff(curFormats, prevFormats) || {};
+      }
+      this.quill.deleteText(range.index-1, 1, Quill.sources.USER);
+      if (Object.keys(formats).length > 0) {
+        this.quill.formatLine(range.index-1, 1, formats, Quill.sources.USER);
+      }
       this.quill.selection.scrollIntoView();
     });
     this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: true, suffix: /^$/ }, function(range) {
