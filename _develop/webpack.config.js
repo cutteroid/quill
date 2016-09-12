@@ -17,19 +17,16 @@ var constantPack = new webpack.DefinePlugin({
 module.exports = {
   context: path.resolve(__dirname, '..'),
   entry: {
-    'quill': ['./quill.js'],
-    'quill.core': [
-      './core.js'
-    ],
-    'quill.custom': [
-      './custom.js'
-    ],
+    'quill.js': ['./quill.js'],
+    'quill.core.js': ['./core.js'],
+    'quill.custom.js': [ './custom.js' ],
+    'quill.core': './assets/core.styl',
     'quill.bubble': './assets/bubble.styl',
     'quill.snow': './assets/snow.styl',
-    'unit': './test/unit.js'
+    'unit.js': './test/unit.js'
   },
   output: {
-    filename: '[name].js',
+    filename: '[name]',
     library: 'Quill',
     libraryTarget: 'umd',
     path: 'dist/'
@@ -111,7 +108,7 @@ if (process.argv.indexOf('--coverage') !== -1) {
 
 if (process.argv.indexOf('--minimize') !== -1) {
   module.exports.entry = {
-    'quill.min': './quill.js'
+    'quill.min.js': './quill.js'
   };
   module.exports.plugins.push(
     new webpack.optimize.DedupePlugin(),
