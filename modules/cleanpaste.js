@@ -14,20 +14,9 @@ class CleanPaste extends Module {
 	}
 
 	cleanPasteData(container, quill) {
-		var _this = quill.cleanpaste;
-
 		var
-			data = container.innerHTML,
-			stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g,
-			commentSripper = new RegExp('<!--(.*?)-->','g'),
-			tagStripper = new RegExp('<(/)*(meta|link|\\?xml:|st1:|o:|nobr|img|font|code|pre|cite|hr|nav|header|footer|article|section|table|td|th|tbody|thead|tfoot|strike|del|kbd|wbr|bdi|small|time)(.*?)>','gi'),
-			badTags = ['style', 'script','applet','embed','noframes','noscript', 'form', 'iframe', 'button'],
-			badAttributes = ['style', 'start', 'align'],
-
-			repeatParagraphs = function( repeats ) {
-					var times = ~~( repeats / 2 );
-					return new Array( times + 1 ).join( '</p><p>' ) + ( repeats % 2 == 1 ? '<br>' : '' );
-			}
+			_this = quill.cleanpaste,
+			data = container.innerHTML
 		;
 
 		if (!data || data == '')
@@ -82,37 +71,6 @@ class CleanPaste extends Module {
 				}
 			}
 		}
-
-		data = container.innerHTML;
-
-		if ( zEditor.Env.webkit && data.indexOf( '<div>' ) > -1 ) {
-
-			data = data
-				.replace( /^(<div>(<br>|)<\/div>)(?!$|(<div>(<br>|)<\/div>))/g, '<br>' )
-				.replace( /^(<div>(<br>|)<\/div>){2}(?!$)/g, '<div></div>' );
-
-			if ( data.match( /<div>(<br>|)<\/div>/ ) ) {
-				data = '<p>' + data.replace( /(<div>(<br>|)<\/div>)+/g, function( match ) {
-					return repeatParagraphs( match.split( '</div><div>' ).length + 1 );
-				} ) + '</p>';
-			}
-
-			data = data.replace( /<\/div><div>/g, '<br>' );
-			data = data.replace( /<\/?div>/g, '' );
-		}
-
-		if ( zEditor.Env.gecko ) {
-
-			data = data.replace( /^<br><br>$/, '<br>' );
-
-			if ( data.indexOf( '<br><br>' ) > -1 ) {
-				data = '<p>' + data.replace( /(<br>){2,}/g, function( match ) {
-					return repeatParagraphs( match.length / 4 );
-				} ) + '</p>';
-			}
-		}
-
-		container.innerHTML = data;
 	}
 
 	isWordCleanNeeded(data) {

@@ -20,8 +20,8 @@ class ObjectNode extends Embed {
 			node.setAttribute('icon', value.type);
 		}
 
-		node.setAttribute('uid', value.uid);
-		node.setAttribute('object', value.object);
+		node.setAttribute('data-uid', value.uid);
+		node.setAttribute('data-object', value.object);
 		node.setAttribute('contenteditable', 'false');
 
 		if (value.index) node.setAttribute('index', value.index);
@@ -43,8 +43,8 @@ class ObjectNode extends Embed {
 	static value(domNode) {
 
 		var data = {
-			"object": domNode.getAttribute('object'),
-			"uid": domNode.getAttribute('uid'),
+			"object": domNode.getAttribute('data-object'),
+			"uid": domNode.getAttribute('data-uid'),
 			"isNew": domNode.classList.contains('new'),
 			"length": 1
 		};
@@ -57,6 +57,7 @@ class ObjectNode extends Embed {
 			data['text'] = entityData.text;
 			domNode.entityText = entityData.text;
 		}
+		if(!data['object']) data['object'] = 'entity';
 		return data;
 	}
 

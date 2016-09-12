@@ -12,7 +12,7 @@ class ObjectLink extends Embed {
 	static create(value) {
 		var node = Inline.create.call(this, value.text);
 		node.setAttribute('href', value.min);
-		node.setAttribute('original', value.original);
+		node.setAttribute('data-original', value.original);
 		node.setAttribute('target', '_blank');
 		node.setAttribute('title', value.text);
 		node.setAttribute('contenteditable', 'false');
@@ -23,7 +23,7 @@ class ObjectLink extends Embed {
 	static value(domNode) {
 		var format = {
 			"min": domNode.getAttribute('href'),
-			"original": domNode.getAttribute('original'),
+			"original": domNode.getAttribute('data-original'),
 			"contenteditable": false,
 			"text": domNode.textContent,
 			"length": domNode.textContent.length

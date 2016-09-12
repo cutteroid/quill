@@ -41,10 +41,10 @@ class ObjectImage extends Embed {
 	static value(domNode) {
 		var format =
 			{
-				"preview": domNode.getAttribute('preview'),
-				"height": domNode.getAttribute('height'),
-				"description": (domNode.hasAttribute('description'))? domNode.getAttribute('description') : null,
-				"uid": domNode.getAttribute('uid')
+				"preview": domNode.getAttribute('data-preview'),
+				"height": domNode.getAttribute('data-height'),
+				"description": (domNode.hasAttribute('data-description'))? domNode.getAttribute('data-description') : null,
+				"uid": domNode.getAttribute('data-uid')
 			};
 		return format;
 	}
