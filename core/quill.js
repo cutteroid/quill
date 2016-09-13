@@ -348,7 +348,7 @@ function expandConfig(container, userConfig) {
       history: true
     }
   }, userConfig);
-  if (userConfig.theme == null || userConfig.theme === Quill.DEFAULTS.theme) {
+  if (!userConfig.theme || userConfig.theme === Quill.DEFAULTS.theme) {
     userConfig.theme = Theme;
   } else {
     userConfig.theme = Quill.import(`themes/${userConfig.theme}`);
@@ -376,7 +376,7 @@ function expandConfig(container, userConfig) {
     return config;
   }, {});
   // Special case toolbar shorthand
-  if (userConfig.modules != null && userConfig.modules.toolbar != null &&
+  if (userConfig.modules != null && userConfig.modules.toolbar &&
       userConfig.modules.toolbar.constructor !== Object) {
     userConfig.modules.toolbar = {
       container: userConfig.modules.toolbar
@@ -388,6 +388,12 @@ function expandConfig(container, userConfig) {
       userConfig[key] = document.querySelector(userConfig[key]);
     }
   });
+  userConfig.modules = Object.keys(userConfig.modules).reduce(function(config, name) {
+    if (userConfig.modules[name]) {
+      config[name] = userConfig.modules[name];
+    }
+    return config;
+  }, {});
   return userConfig;
 }
 
