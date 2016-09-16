@@ -19,7 +19,7 @@ class IdentAttributor extends Parchment.Attributor.Class {
   }
 }
 
-let IndentClass = new IdentAttributor('indent', 'ql-indent', {
+let IndentClass = new IdentAttributor('indent', 'indent', {
   scope: Parchment.Scope.BLOCK,
   whitelist: [1, 2, 3, 4, 5, 6, 7, 8]
 });

@@ -139,8 +139,8 @@ class Images extends Module {
 		if (evt.target.classList.contains('close'))
 			return;
 
-		if (imgNode.hasAttribute('description')) {
-			data.text = imgNode.getAttribute('description');
+		if (imgNode.hasAttribute('data-description')) {
+			data.text = imgNode.getAttribute('data-description');
 			data.edit = true;
 		}
 
@@ -181,7 +181,7 @@ class Images extends Module {
 			data = {},
 			popup = this.openedTools,
 			imgNode = this.openedTools.imageNode,
-			uid = imgNode.getAttribute('uid'),
+			uid = imgNode.getAttribute('data-uid'),
 			descr = ""
 		;
 
@@ -248,7 +248,7 @@ class Images extends Module {
 		if (!imgNode)
 			return;
 
-		var h = parseInt(imgNode.getAttribute('height'), 10);
+		var h = parseInt(imgNode.getAttribute('data-height'), 10);
 
 		this.resizingData = {
 			"startHeight": h,
@@ -267,7 +267,7 @@ class Images extends Module {
 		if (!this.resizingData)
 			return;
 
-		this.resizingData.imgNode.setAttribute('height', this.resizingData.newHeight);
+		this.resizingData.imgNode.setAttribute('data-height', this.resizingData.newHeight);
 		this.resizingData = null;
 	}
 
