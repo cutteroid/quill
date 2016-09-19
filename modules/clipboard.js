@@ -131,6 +131,15 @@ class Clipboard extends Module {
     return delta;
   }
 
+  dangerouslyPasteHTML(index, html, source = Quill.sources.API) {
+    if (typeof index === 'string') {
+      return this.quill.setContents(this.convert(index), html);
+    } else {
+      let paste = this.convert(html);
+      return this.quill.updateContents(new Delta().retain(index).concat(paste), source);
+    }
+  }
+
   onPaste(e) {
     if (e.defaultPrevented) return;
     let range = this.quill.getSelection();
@@ -138,6 +147,7 @@ class Clipboard extends Module {
     let bodyTop = document.body.scrollTop;
     this.container.focus();
     setTimeout(() => {
+      this.quill.selection.update(Quill.sources.SILENT);
       delta = delta.concat(this.convert());
       this.quill.updateContents(delta, Quill.sources.USER);
       // range.length contributes to delta.length()
