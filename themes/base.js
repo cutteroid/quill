@@ -1,7 +1,4 @@
 import extend from 'extend';
-import Delta from 'rich-text/lib/delta';
-import Emitter from '../core/emitter';
-import Keyboard from '../modules/keyboard';
 import Theme from '../core/theme';
 
 class BaseTheme extends Theme {
