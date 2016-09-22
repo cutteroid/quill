@@ -54,8 +54,10 @@ class ObjectNode extends Embed {
 			data['text'] = text;
 		} else {
 			var entityData = zEditor.Utils.getEntityData(data.uid);
-			data['text'] = entityData.text;
-			domNode.entityText = entityData.text;
+			if (entityData) {
+				data['text'] = entityData.text;
+				domNode.entityText = entityData.text;
+			}
 		}
 		if(!data['object']) data['object'] = 'entity';
 		return data;
