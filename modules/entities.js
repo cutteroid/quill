@@ -512,7 +512,10 @@ class Entities extends Module {
 
 	createDomNode(index, data, noRange) {
 		this.quill.insertEmbed(index, data.blotType, data, Emitter.sources.USER);
-		if (!noRange) this.quill.selection.setRange(new Range(index+1, 0));
+		if (!noRange) {
+			this.quill.selection.setRange(new Range(index+1, 0));
+			this.fixCaretPosition({ type: "click" });
+		}
 	}
 
 	createEntityFromPopup(evt, node) {
