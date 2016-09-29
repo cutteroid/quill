@@ -564,7 +564,7 @@ class Entities extends Module {
 			popupData = { "isSub": (isSub), "entities": [] },
 			list = document.querySelector('.editorEntityList'),
 			event = "collectEntityData",
-			propagation = ".entityBox>.spItem"
+			propagation = ".entityBox>.entity"
 		;
 
 		if (this.subPopupData) {
@@ -573,8 +573,8 @@ class Entities extends Module {
 				parentUID = this.subPopupData.node.getAttribute('uid')
 			;
 
-			propagation = ".linkedEntities>.spItem[parentuid='"+parentUID+"']";
-			z.dispatch( { e: event, f: list, p: ".entityBox>.spItem[uid='"+parentUID+"']", data: parentData } );
+			propagation = ".linkedEntities>.entity[parentuid='"+parentUID+"']";
+			z.dispatch( { e: event, f: list, p: ".entityBox>.entity[uid='"+parentUID+"']", data: parentData } );
 
 			popupData['itemUID'] = parentUID;
 			popupData['parentInfo'] = parentData.entities[0];
@@ -687,8 +687,8 @@ class Entities extends Module {
 
 		var bounds = this.quill.getBounds(range.index);
 
-		coords.x = container.offsetLeft + bounds.left;
-		coords.y = container.offsetTop + bounds.top + bounds.height + 2;
+		coords.x = container.offsetLeft + bounds.left + 5;
+		coords.y = container.offsetTop + bounds.top - 4;
 
 		popup.style.left = coords.x + 'px';
 		popup.style.top = coords.y + 'px';
