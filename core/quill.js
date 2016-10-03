@@ -103,11 +103,9 @@ class Quill {
 
   deleteText(index, length, source) {
     [index, length, , source] = overload(index, length, source);
-    let range = this.getSelection();
-    let change = this.editor.deleteText(index, length, source);
-    range = shiftRange(range, index, -1*length, source);
-    this.setSelection(range, Emitter.sources.SILENT);
-    return change;
+    return modify.call(this, source, index, -1*length, () => {
+      return this.editor.deleteText(index, length, source);
+    });
   }
 
   disable() {
@@ -116,6 +114,7 @@ class Quill {
 
   enable(enabled = true) {
     this.editor.enable(enabled);
+    this.container.classList.toggle('ql-disabled', !enabled);
     if (!enabled) {
       this.blur();
     }
@@ -127,6 +126,9 @@ class Quill {
   }
 
   format(name, value, source = Emitter.sources.API) {
+    if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+      return new Delta();
+    }
     let range = this.getSelection(true);
     let change = new Delta();
     if (range == null) return change;
@@ -145,21 +147,17 @@ class Quill {
   formatLine(index, length, name, value, source) {
     let formats;
     [index, length, formats, source] = overload(index, length, name, value, source);
-    let range = this.getSelection();
-    let change = this.editor.formatLine(index, length, formats, source);
-    this.selection.setRange(range, true, Emitter.sources.SILENT);
-    this.selection.scrollIntoView();
-    return change;
+    return modify.call(this, source, index, 0, () => {
+      return this.editor.formatLine(index, length, formats, source);
+    });
   }
 
   formatText(index, length, name, value, source) {
     let formats;
     [index, length, formats, source] = overload(index, length, name, value, source);
-    let range = this.getSelection();
-    let change = this.editor.formatText(index, length, formats, source);
-    this.selection.setRange(range, true, Emitter.sources.SILENT);
-    this.selection.scrollIntoView();
-    return change;
+    return modify.call(this, source, index, 0, () => {
+      return this.editor.formatText(index, length, formats, source);
+    });
   }
 
   getBounds(index, length = 0) {
@@ -207,20 +205,17 @@ class Quill {
   }
 
   insertEmbed(index, embed, value, source = Quill.sources.API) {
-    let range = this.getSelection();
-    let change = this.editor.insertEmbed(index, embed, value, source);
-    range = shiftRange(range, change, source);
-    this.setSelection(range, Emitter.sources.SILENT);
-    return change;
+    return modify.call(this, source, index, null, () => {
+      return this.editor.insertEmbed(index, embed, value, source);
+    });
   }
 
   insertText(index, text, name, value, source) {
-    let formats, range = this.getSelection();
+    let formats;
     [index, , formats, source] = overload(index, 0, name, value, source);
-    let change = this.editor.insertText(index, text, formats, source);
-    range = shiftRange(range, index, text.length, source);
-    this.setSelection(range, Emitter.sources.SILENT);
-    return change;
+    return modify.call(this, source, index, text.length, () => {
+      return this.editor.insertText(index, text, formats, source);
+    });
   }
 
   off() {
@@ -240,15 +235,16 @@ class Quill {
   }
 
   removeFormat(index, length, source) {
-    let range = this.getSelection();
     [index, length, , source] = overload(index, length, source);
-    let change = this.editor.removeFormat(index, length, source);
-    range = shiftRange(range, change, source);
-    this.setSelection(range, Emitter.sources.SILENT);
-    return change;
+    return modify.call(this, source, index, null, () => {
+      return this.editor.removeFormat(index, length, source);
+    });
   }
 
   setContents(delta, source = Emitter.sources.API) {
+    if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+      return new Delta();
+    }
     delta = new Delta(delta).slice();
     let lastOp = delta.ops[delta.ops.length - 1];
     // Quill contents must always end with newline
@@ -281,6 +277,9 @@ class Quill {
   }
 
   updateContents(delta, source = Emitter.sources.API) {
+    if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+      return new Delta();
+    }
     let range = this.getSelection();
     if (Array.isArray(delta)) {
       delta = new Delta(delta.slice());
@@ -369,6 +368,22 @@ function expandConfig(container, userConfig) {
     return config;
   }, {});
   return userConfig;
+}
+
+function modify(source, index, shift, modifier) {
+  let change = new Delta();
+  if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+    return new Delta();
+  }
+  let range = this.getSelection();
+  change = modifier();
+  if (shift === null) {
+    range = shiftRange(range, index, change, source);
+  } else if (shift !== 0) {
+    range = shiftRange(range, index, shift, source);
+  }
+  this.setSelection(range, Emitter.sources.SILENT);
+  return change;
 }
 
 function overload(index, length, name, value, source) {
