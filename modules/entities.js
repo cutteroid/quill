@@ -308,7 +308,7 @@ class Entities extends Module {
 	}
 
 	handleMouseDown(evt) {
-		this.hidePopups();
+		zEditor.EntityPopup.hidePopups();
 	}
 
 	cleanUp() {
@@ -503,11 +503,29 @@ class Entities extends Module {
 		this.createDomNode(sIndex, obj);
 
 		if (data)
-			this.hidePopups();
+			zEditor.EntityPopup.hidePopups();
 		else
 			zEditor.Utils.listAddItem(obj);
 
 		if (evt) evt.preventDefault();
+	}
+
+	createNewEntityNode(text) {
+
+		var index = this.__startIndex;
+
+		if (!index || text.length == 0)
+			return;
+
+		var
+			uid = md5(Date.now().toString()),
+			obj = { object: 'entity', uid: uid, text: text, isNew: true }
+		;
+
+		obj.blotType = 'objectnode';
+		this.createDomNode(index, obj);
+
+		zEditor.Utils.listAddItem(obj);
 	}
 
 	createDomNode(index, data, noRange) {
@@ -533,225 +551,6 @@ class Entities extends Module {
 		this.createEntityNode(evt, data);
 	}
 
-	entityListPopup(isSub) {
-
-		var
-			popup,
-			cont = this.createEntityPopup(isSub)
-		;
-
-		popup = (cont)? cont.querySelector('.editorSuggest') : null;
-
-		if (!popup)
-			return false;
-
-		popup.classList.add('open');
-		this.quill.root.classList.add('popupOpen');
-
-		this.entityPopup = popup;
-
-		popup.editor = this;
-
-		this.fixPopupPosition(popup);
-		if (isSub) this.filterPopupItems();
-	}
-
-	createEntityPopup(isSub) {
-
-		var
-			res,
-			tmpE = {},
-			popupData = { "isSub": (isSub), "entities": [] },
-			list = document.querySelector('.editorEntityList'),
-			event = "collectEntityData",
-			propagation = ".entityBox>.entity"
-		;
-
-		if (this.subPopupData) {
-			var
-				parentData = {},
-				parentUID = this.subPopupData.node.getAttribute('uid')
-			;
-
-			propagation = ".linkedEntities>.entity[parentuid='"+parentUID+"']";
-			z.dispatch( { e: event, f: list, p: ".entityBox>.entity[uid='"+parentUID+"']", data: parentData } );
-
-			popupData['itemUID'] = parentUID;
-			popupData['parentInfo'] = parentData.entities[0];
-		}
-
-		z.dispatch( { e: event, f: list, p: propagation, data: popupData } );
-
-		if (!popupData.entities || !popupData.entities.length)
-			return null;
-
-		if (this.entityPopup)
-			this.entityPopup.parentNode.removeChild(this.entityPopup);
-
-		tmpE.c = this.quill.root.parentNode;
-		tmpE.data = popupData;
-
-		res = z.template( tmpE, ["reportForm_entitySuggestPopup", "add"] );
-
-		if (res) {
-			var popup = res.querySelector('.editorSuggest');
-			popup._data_ = popupData;
-		}
-
-		return res;
-	}
-
-	processPopupKeys(e) {
-
-		var
-			direction,
-			entityName = '',
-			eType = e.type,
-			key = e.which || e.keyCode || 0,
-			charCode = e.charCode || 0
-		;
-
-		switch (key) {
-			case 90:
-				// ctrl/cmd + Z
-				if (e.metaKey || e.ctrlKey) {
-					this.hidePopups()
-					return;
-				}
-			case 27:
-				// ESC
-				//e.preventDefault();
-				this.hidePopups()
-				break;
-
-			case 13:
-				// ENTER
-				if ( this.entityPopup.classList.contains('hiddenBlock') ) {
-					this.hidePopups()
-					return;
-				}
-
-				var selected = this.getSelectedSuggest();
-
-				if (selected) {
-					this.createEntityFromPopup(e, selected);
-				} else {
-					e.preventDefault();
-				}
-
-				break;
-
-			case 38:
-			case 40:
-				// up/down logic
-				if ( eType == 'keydown' && !this.entityPopup.classList.contains('hiddenBlock') ) {
-					e.preventDefault();
-					direction = (key == 38)? 'up' : 'down';
-
-					z.dispatch(	{ e: "processArrowKeys", f: this.entityPopup, p: "parent", data: { direction: direction } } );
-				}
-				break;
-
-			case 37:
-			case 39:
-				// left/right logic
-				if ( !this.entityPopup.classList.contains('hiddenBlock') ) {
-
-					if ( eType == 'keyup' ) {
-						if ( key == 37 ) this.handleSuggestBack();
-						if ( key == 39 ) this.handleSuggestForward();
-						this.fixPopupPosition(this.entityPopup);
-					}
-
-					e.preventDefault();
-				}
-				break;
-
-			default:
-				if ( eType == 'keyup' ) {
-					this.filterPopupItems(charCode);
-				}
-		}
-	}
-
-	fixPopupPosition(popup) {
-
-		var
-			coords = {},
-			range = this.getRange(),
-			container = this.quill.root
-		;
-
-		if (!popup || range.index == null)
-			return;
-
-		var bounds = this.quill.getBounds(range.index);
-
-		coords.x = container.offsetLeft + bounds.left + 5;
-		coords.y = container.offsetTop + bounds.top - 4;
-
-		popup.style.left = coords.x + 'px';
-		popup.style.top = coords.y + 'px';
-	}
-
-	getSelectedSuggest(node) {
-		var selected = (node)? node : this.quill.root.parentNode.querySelector('.editorSuggest.open .active');
-		return selected;
-	}
-
-	filterPopupItems(charCode) {
-
-		var
-			range = this.quill.selection.getRange()[0],
-			data = { matches: [] },
-			subText = null,
-			charCode = charCode || 0,
-			textStart = 0,
-			start = this.__startIndex,
-			text
-		;
-
-		if (range.length == 0) {
-			var textLength = range.index - start;
-			text = this.quill.getText(start, textLength);
-
-			data.text = text.split('((').pop();
-		}
-
-		z.dispatch( { e: "filterEditorSuggest", f: this.visiblePopup, p: ".suggestItem", data: data } );
-
-		if ( data.matches[0] ) {
-
-			if ( this.entityPopup.classList.contains('hiddenBlock') ) {
-				this.entityPopup.classList.remove('hiddenBlock');
-			}
-
-			this.fixPopupPosition(this.visiblePopup);
-			data.matches[0].classList.add('active');
-
-		} else {
-			if ( text.indexOf('((') != -1 || textStart > 0 )
-				this.entityPopup.classList.add('hiddenBlock');
-			else
-				this.hidePopups();
-		}
-	}
-
-	hidePopups() {
-
-		var openPopups = document.querySelectorAll('.editorSuggest.open');
-
-		for (var i = 0; i < openPopups.length; ++i) {
-			var popup = openPopups[i];
-			popup.parentNode.removeChild(popup);
-		}
-
-		this.subPopupData = null;
-		this.entityPopup = null;
-
-		this.quill.root.classList.remove('popupOpen');
-	}
-
 	handleBrackets(evt, isOpening) {
 
 		var
@@ -765,84 +564,18 @@ class Entities extends Module {
 		}
 
 		if (!prevSymbol) {
-			this.hidePopups();
+			zEditor.EntityPopup.hidePopups();
 			return;
 		}
 
 		if ( isOpening && prevSymbol == '(' ) {
 			this.__startIndex = index - 1;
-			if (!this.entityPopup) this.entityListPopup();
+			if (!this.entityPopup) {
+				this.quill.deleteText(this.__startIndex, 1, Emitter.sources.USER);
+				zEditor.EntityPopup.entityListPopup(false, this.quill, this.__startIndex);
+				evt.preventDefault();
+			}
 		}
-
-		if ( !isOpening && prevSymbol == ')' ) {
-			this.hidePopups();
-			this.__endIndex = index;
-			var obj = this;
-			this.createEntityNode(evt);
-		}
-	}
-
-	handleSuggestForward(force) {
-
-		var
-			selected = this.getSelectedSuggest(force),
-			range = this.getRange(),
-			textStart = this.__startIndex + 2
-		;
-
-		if (range.index === null)
-			return;
-
-		if ( this.entityPopup.classList.contains('isSub') ) {
-			return;
-		}
-
-		if ( selected && selected.hasAttribute('hasSubs')) {
-
-			this.hidePopups();
-
-			this.subPopupData = {
-				'node': selected,
-				'start': textStart,
-				'index': range.index,
-				'text' : this.quill.getText(textStart, range.index - textStart)
-			};
-
-			this.quill.deleteText(textStart, range.index - textStart, Emitter.sources.USER);
-			this.selection.setRange(new Range(textStart, 0));
-
-			this.entityListPopup(true);
-		} else {
-			this.subPopupData = null;
-		}
-	}
-
-	handleSuggestBack() {
-
-		var
-			data = this.subPopupData,
-			text = (data)? data.text.trim() : null,
-			range = this.getRange()
-		;
-
-		if (!data || range.index === null)
-			return;
-
-		if ( !this.entityPopup.classList.contains('isSub') ) {
-			return;
-		}
-
-		this.quill.deleteText(data.start, range.index - data.start, Emitter.sources.USER);
-
-		if ( text != '' ) {
-			this.quill.insertText(data.start, text, Emitter.sources.USER);
-		}
-
-		this.selection.setRange(new Range(data.index, 0));
-
-		this.subPopupData = null;
-		this.entityListPopup();
-		this.filterPopupItems()
 	}
 
 	openLinkDialog(evt, blot) {
