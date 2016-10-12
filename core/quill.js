@@ -138,7 +138,7 @@ class Quill {
   }
 
   format(name, value, source = Emitter.sources.API) {
-    if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+    if (!this.isEnabled() && source === Emitter.sources.USER) {
       return new Delta();
     }
     let range = this.getSelection(true);
@@ -230,6 +230,10 @@ class Quill {
     });
   }
 
+  isEnabled() {
+    return !this.container.classList.contains('ql-disabled');
+  }
+
   off() {
     return this.emitter.off.apply(this.emitter, arguments);
   }
@@ -254,7 +258,7 @@ class Quill {
   }
 
   setContents(delta, source = Emitter.sources.API) {
-    if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+    if (!this.isEnabled() && source === Emitter.sources.USER) {
       return new Delta();
     }
     delta = new Delta(delta).slice();
@@ -289,7 +293,7 @@ class Quill {
   }
 
   updateContents(delta, source = Emitter.sources.API) {
-    if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+    if (!this.isEnabled() && source === Emitter.sources.USER) {
       return new Delta();
     }
     let range = this.getSelection();
@@ -396,7 +400,7 @@ function expandConfig(container, userConfig) {
 
 function modify(source, index, shift, modifier) {
   let change = new Delta();
-  if (this.container.classList.contains('ql-disabled') && source === Emitter.sources.USER) {
+  if (!this.isEnabled() && source === Emitter.sources.USER) {
     return new Delta();
   }
   let range = this.getSelection();
