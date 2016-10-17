@@ -13,8 +13,6 @@ let debug = logger('quill');
 
 class Quill {
 
-
-
   static debug(limit) {
     logger.level(limit);
   }
@@ -90,26 +88,20 @@ class Quill {
       }
     });
 
-    let contents = this.clipboard.convert(`<div class='editable' style="white-space: normal;">${html}<p><br></p></div>`);
+    let contents = this.clipboard.convert(`<div class='ql-editor' style="white-space: normal;">${html}<p><br></p></div>`);
     this.setContents(contents);
 
-    this.emitter.on(Emitter.events.EDITOR_CHANGE, (type) => {
-      if (type === Emitter.events.TEXT_CHANGE) {
-        this.root.classList.toggle('ql-blank', this.editor.isBlank());
-      }
-    });
-
-    this.pasteHTML(`<div class='ql-editor' style="white-space: normal;">${html}<p><br></p></div>`);
-
     this.history.clear();
-    if (this.options.readOnly) {
-      this.disable();
-    }
     if (this.options.placeholder) {
       this.root.setAttribute('data-placeholder', this.options.placeholder);
     }
 
     this.root.parentNode._editor = this;
+
+    if (this.options.readOnly) {
+      this.disable();
+    }
+
   }
 
   addContainer(container, refNode = null) {
@@ -327,8 +319,7 @@ class Quill {
 
     if (body.classList.contains('fullscreenEditor')) {
       body.classList.remove('fullscreenEditor');
-    }
-    else {
+    } else {
       body.classList.add('fullscreenEditor');
     }
   }
@@ -345,6 +336,7 @@ Quill.DEFAULTS = {
 };
 Quill.events = Emitter.events;
 Quill.sources = Emitter.sources;
+// eslint-disable-next-line no-undef
 Quill.version = typeof(QUILL_VERSION) === 'undefined' ? 'dev' : QUILL_VERSION;
 
 Quill.imports = {

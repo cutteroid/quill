@@ -32,9 +32,7 @@ Quill.register({
 
 Parchment.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
 
-
 module.exports = Quill;
-
 
 // import Quill from './core';
 
@@ -94,11 +92,7 @@ module.exports = Quill;
 //   'modules/entities': Entities
 // }, true);
 
-
-
-
 // module.exports = Quill;
-
 
 // // import Quill from './core';
 
@@ -155,6 +149,5 @@ module.exports = Quill;
 // //   'themes/snow': SnowTheme
 
 // // }, true);
-
 
 // // module.exports = Quill;

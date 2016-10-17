@@ -1,8 +1,5 @@
 import extend from 'extend';
-import Emitter from '../core/emitter';
 import BaseTheme from './base';
-
-import { Range } from '../core/selection';
 
 const TOOLBAR_CONFIG = [
   [ 'bold', 'italic', 'underline' ],
@@ -19,7 +16,8 @@ class SnowTheme extends BaseTheme {
     super(quill, options);
   }
 
-  extendToolbar(toolbar) {
+  // extendToolbar(toolbar) {
+    extendToolbar() {
     // if (toolbar.container.querySelector('.ql-link')) {
     //   this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
     //     toolbar.handlers['link'].call(toolbar, !context.format.link);
