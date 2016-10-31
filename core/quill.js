@@ -14,6 +14,9 @@ let debug = logger('quill');
 class Quill {
 
   static debug(limit) {
+    if (limit === true) {
+      limit = 'log';
+    }
     logger.level(limit);
   }
 
@@ -62,7 +65,10 @@ class Quill {
     let html = this.container.innerHTML.trim();
     this.container.classList.add('editorContainer');
     this.container.innerHTML = '';
-    this.root = this.addContainer('editable');
+
+    this.root = this.addContainer('editable');;
+    this.root.classList.add('isBlank');
+
     this.emitter = new Emitter();
     this.scroll = Parchment.create(this.root, {
       emitter: this.emitter,
@@ -84,7 +90,7 @@ class Quill {
 
     this.emitter.on(Emitter.events.EDITOR_CHANGE, (type) => {
       if (type === Emitter.events.TEXT_CHANGE) {
-        this.root.classList.toggle('ql-blank', this.editor.isBlank());
+        this.root.classList.toggle('isBlank', this.editor.isBlank());
       }
     });
 
@@ -272,14 +278,17 @@ class Quill {
 
   setContents(delta, source = Emitter.sources.API) {
     return modify.call(this, () => {
-      delta = new Delta(delta).slice();
-      let lastOp = delta.ops[delta.ops.length - 1];
-      // Quill contents must always end with newline
-      if (lastOp == null || lastOp.insert[lastOp.insert.length-1] !== '\n') {
-        delta.insert('\n');
+      delta = new Delta(delta);
+      let length = this.getLength();
+      let deleted = this.editor.deleteText(0, length);
+      let applied = this.editor.applyDelta(delta);
+      let lastOp = applied.ops[applied.ops.length - 1];
+      if (lastOp != null && lastOp.insert[lastOp.insert.length-1] === '\n') {
+        this.editor.deleteText(this.getLength() - 1, 1);
+        applied.delete(1);
       }
-      delta.delete(this.getLength());
-      return this.editor.applyDelta(delta);
+      let ret = deleted.compose(applied);
+      return ret;
     }, source);
   }
 
@@ -306,9 +315,7 @@ class Quill {
 
   updateContents(delta, source = Emitter.sources.API) {
     return modify.call(this, () => {
-      if (Array.isArray(delta)) {
-        delta = new Delta(delta.slice());
-      }
+      delta = new Delta(delta);
       return this.editor.applyDelta(delta, source);
     }, source, true);
   }
