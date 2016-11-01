@@ -66,7 +66,7 @@ class Quill {
     this.container.classList.add('editorContainer');
     this.container.innerHTML = '';
 
-    this.root = this.addContainer('editable');;
+    this.root = this.addContainer('editable');
     this.root.classList.add('isBlank');
 
     this.emitter = new Emitter();

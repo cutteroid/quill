@@ -61,7 +61,9 @@ class Images extends Module {
 			return;
 		}
 
-		this.quill.entities.hidePopups();
+		// this.quill.entities.hidePopups();
+		zEditor.EntityPopup.hidePopups();
+
 		z.dispatch(	{ e: "collectImagesData", f: target, p: ".filePreview", data: data } );
 
 		tmpFragment.appendChild(tmpNode);

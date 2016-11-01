@@ -591,7 +591,8 @@ class Entities extends Module {
 			selectedText = ''
 		;
 
-		this.quill.entities.hidePopups();
+		// this.quill.entities.hidePopups();
+		zEditor.EntityPopup.hidePopups();
 
 		if (blot) {
 			target = blot.domNode;

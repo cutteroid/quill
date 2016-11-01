@@ -53,11 +53,11 @@ module.exports = {
     extensions: ['', '.js', '.styl', '.ts']
   },
   module: {
-    preLoaders: [{
-      loader: 'eslint',
-      test: /\.js$/,
-      include: source
-    }],
+    // preLoaders: [{
+    //   loader: 'eslint',
+    //   test: /\.js$/,
+    //   include: source
+    // }],
     loaders: [{
       loader: 'ts',
       test: /\.ts$/
