@@ -28,10 +28,13 @@ class BaseTheme extends Theme {
   }
 
 }
+
 BaseTheme.DEFAULTS = extend(true, {}, Theme.DEFAULTS, {
   modules: {
     toolbar: {
+
       handlers: {}
+
     }
   }
 });

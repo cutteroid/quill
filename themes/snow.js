@@ -16,6 +16,7 @@ class SnowTheme extends BaseTheme {
     super(quill, options);
   }
 
+
   // extendToolbar(toolbar) {
     extendToolbar() {
     // if (toolbar.container.querySelector('.ql-link')) {
@@ -23,6 +24,7 @@ class SnowTheme extends BaseTheme {
     //     toolbar.handlers['link'].call(toolbar, !context.format.link);
     //   });
     // }
+
   }
 }
 SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {

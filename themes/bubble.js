@@ -2,6 +2,7 @@ import extend from 'extend';
 import Emitter from '../core/emitter';
 import BaseTheme, { BaseTooltip } from './base';
 import { Range } from '../core/selection';
+import icons from '../ui/icons';
 
 
 const TOOLBAR_CONFIG = [
@@ -21,8 +22,8 @@ class BubbleTheme extends BaseTheme {
   extendToolbar(toolbar) {
     this.tooltip = new BubbleTooltip(this.quill, this.options.bounds);
     this.tooltip.root.appendChild(toolbar.container);
-    this.buildButtons([].slice.call(toolbar.container.querySelectorAll('button')));
-    this.buildPickers([].slice.call(toolbar.container.querySelectorAll('select')));
+    this.buildButtons([].slice.call(toolbar.container.querySelectorAll('button')), icons);
+    this.buildPickers([].slice.call(toolbar.container.querySelectorAll('select')), icons);
   }
 }
 BubbleTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
@@ -92,9 +93,9 @@ class BubbleTooltip extends BaseTooltip {
 
   position(reference) {
     let shift = super.position(reference);
-    if (shift === 0) return shift;
     let arrow = this.root.querySelector('.ql-tooltip-arrow');
     arrow.style.marginLeft = '';
+    if (shift === 0) return shift;
     arrow.style.marginLeft = (-1*shift - arrow.offsetWidth/2) + 'px';
   }
 }
@@ -107,4 +108,4 @@ BubbleTooltip.TEMPLATE = [
 ].join('');
 
 
-export default BubbleTheme;
+export { BubbleTooltip, BubbleTheme as default };
