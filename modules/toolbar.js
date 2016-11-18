@@ -133,7 +133,7 @@ class Toolbar extends Module {
       } else {
         if (range == null) {
           input.classList.remove('active');
-          if (images.openedPanel != null) {
+          if (images && images.openedPanel != null) {
             images.closeImagePanel();
           }
         } else if (input.hasAttribute('type')) {

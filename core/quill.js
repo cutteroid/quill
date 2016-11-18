@@ -81,11 +81,9 @@ class Quill {
     this.keyboard = this.theme.addModule('keyboard');
 
     this.clipboard = this.theme.addModule('clipboard');
-    this.images = this.theme.addModule('images');
-    this.entities = this.theme.addModule('entities');
     this.keyboard = this.theme.addModule('keyboard');
     this.history = this.theme.addModule('history');
-    this.cleanpaste = this.theme.addModule('cleanpaste');
+
     this.theme.init();
 
     this.emitter.on(Emitter.events.EDITOR_CHANGE, (type) => {
@@ -130,6 +128,7 @@ class Quill {
 
   blur() {
     this.selection.setRange(null);
+    if (this.selection.cursor) this.selection.cursor.remove();
   }
 
   deleteText(index, length, source) {

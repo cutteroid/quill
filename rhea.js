@@ -14,7 +14,7 @@ import Bold from './formats/bold';
 import Italic from './formats/italic';
 import Script from './formats/script';
 import Strike from './formats/strike';
-import Underline from './formats/underline';
+import LinkStyle from './formats/linkstyle';
 
 import Clipboard from './modules/clipboard';
 import History from './modules/history';
@@ -30,7 +30,7 @@ Quill.register({
   'formats/italic': Italic,
   'formats/script': Script,
   'formats/strike': Strike,
-  'formats/underline': Underline,
+  'formats/linkstyle': LinkStyle,
 
   'blots/block'        : Block,
   'blots/block/embed'  : BlockEmbed,
