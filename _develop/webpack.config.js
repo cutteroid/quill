@@ -98,6 +98,7 @@ module.exports = {
   ts: {
     configFileName: 'tsconfig.json',
     compilerOptions: {
+      declaration: false,
       target: 'es5',
       module: 'commonjs'
     },
