@@ -97,7 +97,7 @@ class Quill {
       let index = range && range.length === 0 ? range.index : undefined;
       modify.call(this, () => {
         return this.editor.update(null, mutations, index);
-      }, source, true);
+      }, source);
     });
 
     let contents = this.clipboard.convert(`<div class='ql-editor' style="white-space: normal;">${html}<p><br></p></div>`);
@@ -336,6 +336,7 @@ Quill.DEFAULTS = {
   placeholder: '',
   readOnly: false,
   alias: '',
+  scrollingContainer: null,
   strict: true,
   theme: 'default'
 };
@@ -395,7 +396,7 @@ function expandConfig(container, userConfig) {
     };
   }
   userConfig = extend(true, {}, Quill.DEFAULTS, { modules: moduleConfig }, themeConfig, userConfig);
-  ['bounds', 'container'].forEach(function(key) {
+  ['bounds', 'container', 'scrollingContainer'].forEach(function(key) {
     if (typeof userConfig[key] === 'string') {
       userConfig[key] = document.querySelector(userConfig[key]);
     }
@@ -418,7 +419,7 @@ function modify(modifier, source, index, shift) {
   let range = index == null ? null : this.getSelection();
   let oldDelta = this.editor.delta;
   let change = modifier();
-  if (range != null) {
+  if (range != null && source === Emitter.sources.USER) {
     if (index === true) index = range.index;
     if (shift == null) {
       range = shiftRange(range, change, source);

@@ -59,6 +59,7 @@ class Clipboard extends Module {
     this.container.setAttribute('tabindex', -1);
     this.matchers = [];
     this.preprocess = [];
+    this.scrollingContainer = quill.options.scrollingContainer || document.body;
     CLIPBOARD_CONFIG.concat(this.options.matchers).forEach((pair) => {
       this.addMatcher(...pair);
     });
@@ -102,7 +103,7 @@ class Clipboard extends Module {
     if (e.defaultPrevented || !this.quill.isEnabled()) return;
     let range = this.quill.getSelection();
     let delta = new Delta().retain(range.index).delete(range.length);
-    let bodyTop = document.body.scrollTop;
+    let scrollTop = this.scrollingContainer.scrollTop;
     this.container.focus();
     setTimeout(() => {
       this.quill.selection.update(Quill.sources.SILENT);
@@ -110,7 +111,7 @@ class Clipboard extends Module {
       this.quill.updateContents(delta, Quill.sources.USER);
       // range.length contributes to delta.length()
       this.quill.setSelection(delta.length() - range.length, Quill.sources.SILENT);
-      document.body.scrollTop = bodyTop;
+      this.scrollingContainer.scrollTop = scrollTop;
       this.quill.selection.scrollIntoView();
     }, 1);
   }
