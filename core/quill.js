@@ -74,6 +74,7 @@ class Quill {
       emitter: this.emitter,
       whitelist: this.options.formats
     });
+    this.emitter.sources = Emitter.sources;
     this.editor = new Editor(this.scroll);
     this.selection = new Selection(this.scroll, this.emitter);
 

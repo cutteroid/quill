@@ -16,7 +16,7 @@ var constantPack = new webpack.DefinePlugin({
 var source = [
   'quill.js',
   'core.js',
-  'custom.js',
+  'irst.js',
   'rhea.js',
   'blots',
   'core',
@@ -35,7 +35,7 @@ module.exports = {
   entry: {
     'quill.js': ['./quill.js'],
     'quill.core.js': ['./core.js'],
-    'quill.custom.js': [ './custom.js' ],
+    'quill.irst.js': [ './irst.js' ],
     'quill.rhea.js': [ './rhea.js' ],
     'quill.core': './assets/core.styl',
     'quill.bubble': './assets/bubble.styl',
