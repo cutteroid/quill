@@ -18,7 +18,7 @@ class Entities extends Module {
 		this.spacer = "\u200B";
 		this.filler = null;
 
-		this.fixCaret = true;
+		this.fixCaret = false;
 
 		this.listen();
 
@@ -474,58 +474,23 @@ class Entities extends Module {
 		}
 	}
 
-	createEntityNode(evt, data) {
-
-		if (this.__startIndex === null) return;
+	createEntityNode(position, data) {
 
 		var
-			sIndex = this.__startIndex,
-			eIndex = this.__endIndex,
-			length = eIndex - sIndex,
-			entityText = this.quill.getText(sIndex, length),
-			text = (data)? data.text : entityText.slice(2,-1).trim()
+			text = data.text || "",
+			uid = data.uid || md5(Date.now().toString()),
+			isNew = (data.uid)? false : true,
+			entityData = { object: 'entity', uid: uid, text: text, isNew: isNew }
 		;
 
-		this.__startIndex = null;
-		this.__endIndex = null;
-
-		if (text.length == 0)
+		if (position === undefined || text.length == 0)
 			return;
 
-		var
-			uid = (data)? null : md5(Date.now().toString()),
-			obj = (data)? data : { object: 'entity', uid: uid, text: text, isNew: true }
-		;
+		if (data.type) entityData.type = data.type;
+		if (data.index) entityData.index = data.index;
 
-		this.quill.deleteText(sIndex, length, Emitter.sources.USER);
-
-		obj.blotType = 'objectnode';
-		this.createDomNode(sIndex, obj);
-
-		if (data)
-			zEditor.EntityPopup.hidePopups();
-		else
-			zEditor.Utils.listAddItem(obj);
-
-		if (evt) evt.preventDefault();
-	}
-
-	createNewEntityNode(text) {
-
-		var index = this.__startIndex;
-
-		if (!index || text.length == 0)
-			return;
-
-		var
-			uid = md5(Date.now().toString()),
-			obj = { object: 'entity', uid: uid, text: text, isNew: true }
-		;
-
-		obj.blotType = 'objectnode';
-		this.createDomNode(index, obj);
-
-		zEditor.Utils.listAddItem(obj);
+		entityData.blotType = 'objectnode';
+		this.createDomNode(position, entityData);
 	}
 
 	createDomNode(index, data, noRange) {
@@ -534,21 +499,6 @@ class Entities extends Module {
 			this.quill.selection.setRange(new Range(index+1, 0));
 			this.fixCaretPosition({ type: "click" });
 		}
-	}
-
-	createEntityFromPopup(evt, node) {
-
-		var
-			uid = node.getAttribute('uid'),
-			data = zEditor.Utils.getEntityData(uid),
-			range = this.quill.selection.getRange()[0];
-		;
-
-		if (!data)
-			return;
-
-		this.__endIndex = range.index;
-		this.createEntityNode(evt, data);
 	}
 
 	handleBrackets(evt, isOpening) {
