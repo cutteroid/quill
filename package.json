@@ -1,6 +1,6 @@
 {
   "name": "quill",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Your powerful, rich text editor",
   "author": "Jason Chen <jhchen7@gmail.com>",
   "homepage": "http://quilljs.com",
@@ -36,7 +36,7 @@
     "deep-equal": "~1.0.1",
     "eventemitter3": "~2.0.2",
     "extend": "~3.0.0",
-    "parchment": "1.0.6",
+    "parchment": "1.0.7",
     "quill-delta": "3.4.3"
   },
   "devDependencies": {
