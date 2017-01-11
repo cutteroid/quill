@@ -217,6 +217,7 @@ function addSelect(container, format, values) {
 Toolbar.DEFAULTS = {
   container: null,
   handlers: {
+
     clean: function() {
       let range = this.quill.getSelection();
       if (range == null) return;
@@ -232,6 +233,7 @@ Toolbar.DEFAULTS = {
         this.quill.removeFormat(range, Quill.sources.USER);
       }
     },
+
     direction: function(value) {
       let align = this.quill.getFormat()['align'];
       if (value === 'rtl' && align == null) {
@@ -241,6 +243,7 @@ Toolbar.DEFAULTS = {
       }
       this.quill.format('direction', value, Quill.sources.USER);
     },
+
     indent: function(value) {
       let range = this.quill.getSelection();
       let formats = this.quill.getFormat(range);
@@ -251,15 +254,33 @@ Toolbar.DEFAULTS = {
         this.quill.format('indent', indent + modifier, Quill.sources.USER);
       }
     },
+
     link: function(value, evt) {
       this.quill.entities.openLinkDialog(evt);
     },
+
     image: function(value, evt) {
       this.quill.images.openImagePanel(evt);
     },
+
     fullscreen: function(value, evt) {
       this.quill.fullscreenMode(evt);
+    },
+
+    list: function(value) {
+      let range = this.quill.getSelection();
+      let formats = this.quill.getFormat(range);
+      if (value === 'check') {
+        if (formats['list'] === 'checked' || formats['list'] === 'unchecked') {
+          this.quill.format('list', false, Quill.sources.USER);
+        } else {
+          this.quill.format('list', 'unchecked', Quill.sources.USER);
+        }
+      } else {
+        this.quill.format('list', value, Quill.sources.USER);
+      }
     }
+
   }
 }
 

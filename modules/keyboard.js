@@ -35,7 +35,7 @@ class Keyboard extends Module {
     });
     this.addBinding({ key: Keyboard.keys.ENTER, shiftKey: null }, handleEnter);
     this.addBinding({ key: Keyboard.keys.ENTER, metaKey: null, ctrlKey: null, altKey: null }, function() {});
-    if (/Gecko/i.test(navigator.userAgent)) {
+    if (/Firefox/i.test(navigator.userAgent)) {
       // Need to handle delete and backspace for Firefox in the general case #1171
       this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true }, handleBackspace);
       this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: true }, handleDelete);
@@ -253,16 +253,20 @@ function handleBackspace(range, context) {
     let prevFormats = this.quill.getFormat(range.index-1, 1);
     formats = DeltaOp.attributes.diff(curFormats, prevFormats) || {};
   }
-  this.quill.deleteText(range.index-1, 1, Quill.sources.USER);
+  // Check for astral symbols
+  let length = /[\uD800-\uDBFF][\uDC00-\uDFFF]$/.test(context.prefix) ? 2 : 1;
+  this.quill.deleteText(range.index-length, length, Quill.sources.USER);
   if (Object.keys(formats).length > 0) {
-    this.quill.formatLine(range.index-1, 1, formats, Quill.sources.USER);
+    this.quill.formatLine(range.index-length, length, formats, Quill.sources.USER);
   }
   this.quill.selection.scrollIntoView();
 }
 
-function handleDelete(range) {
-  if (range.index >= this.quill.getLength() - 1) return;
-  this.quill.deleteText(range.index, 1, Quill.sources.USER);
+function handleDelete(range, context) {
+  // Check for astral symbols
+  let length = /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(context.suffix) ? 2 : 1;
+  if (range.index >= this.quill.getLength() - length) return;
+  this.quill.deleteText(range.index, length, Quill.sources.USER);
 }
 
 function handleDeleteRange(range) {
