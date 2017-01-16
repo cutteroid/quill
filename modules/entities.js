@@ -479,7 +479,7 @@ class Entities extends Module {
 		var
 			text = data.text || "",
 			uid = data.uid || md5(Date.now().toString()),
-			isNew = (data.uid)? false : true,
+			isNew = (!data.isNew && data.uid)? false : true,
 			entityData = { object: 'entity', uid: uid, text: text, isNew: isNew }
 		;
 

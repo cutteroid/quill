@@ -18,6 +18,7 @@ class ObjectNode extends Embed {
 		if (value.type) {
 			node.setAttribute('type', value.type);
 			node.setAttribute('icon', value.type);
+			node.setAttribute('data-type', value.type);
 		}
 
 		node.setAttribute('data-uid', value.uid);
@@ -43,8 +44,10 @@ class ObjectNode extends Embed {
 	static value(domNode) {
 
 		var data = {
-			"object": domNode.getAttribute('data-object'),
 			"uid": domNode.getAttribute('data-uid'),
+			"type": domNode.getAttribute('data-type'),
+			"object": domNode.getAttribute('data-object'),
+			"index": domNode.getAttribute('index'),
 			"isNew": domNode.classList.contains('new'),
 			"length": 1
 		};
