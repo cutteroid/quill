@@ -26,7 +26,7 @@ class ObjectNode extends Embed {
 		node.setAttribute('contenteditable', 'false');
 
 		if (value.index) node.setAttribute('index', value.index);
-		if (value.isNew) node.classList.add('new');
+		if (value.is_new) node.classList.add('new');
 
 		node.innerHTML = value.text;
 
@@ -48,7 +48,7 @@ class ObjectNode extends Embed {
 			"type": domNode.getAttribute('data-type'),
 			"object": domNode.getAttribute('data-object'),
 			"index": domNode.getAttribute('index'),
-			"isNew": domNode.classList.contains('new'),
+			"is_new": domNode.classList.contains('new'),
 			"length": 1
 		};
 
