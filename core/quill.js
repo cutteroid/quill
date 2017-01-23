@@ -20,6 +20,10 @@ class Quill {
     logger.level(limit);
   }
 
+  static find(node) {
+    return node.__quill || Parchment.find(node);
+  }
+
   static import(name) {
     if (this.imports[name] == null) {
       debug.error(`Cannot import ${name}. Are you sure it was registered?`);
@@ -69,6 +73,8 @@ class Quill {
 
     this.root = this.addContainer('editable');
     this.root.classList.add('isBlank');
+
+    this.container.__quill = this;
 
     this.emitter = new Emitter();
     this.scroll = Parchment.create(this.root, {
@@ -147,9 +153,6 @@ class Quill {
   enable(enabled = true) {
     this.scroll.enable(enabled);
     this.container.classList.toggle('ql-disabled', !enabled);
-    if (!enabled) {
-      this.blur();
-    }
   }
 
   focus() {
@@ -215,8 +218,28 @@ class Quill {
     }
   }
 
+  getIndex(blot) {
+    return blot.offset(this.scroll);
+  }
+
   getLength() {
     return this.scroll.length();
+  }
+
+  getLeaf(index) {
+    return this.scroll.leaf(index);
+  }
+
+  getLine(index) {
+    return this.scroll.line(index);
+  }
+
+  getLines(index = 0, length = Number.MAX_VALUE) {
+    if (typeof index !== 'number') {
+      return this.scroll.lines(index.index, index.length);
+    } else {
+      return this.scroll.lines(index, length);
+    }
   }
 
   getModule(name) {
