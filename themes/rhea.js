@@ -4,7 +4,8 @@ import BaseTheme from './base';
 const TOOLBAR_CONFIG = [
   [ 'bold', 'italic', 'strike' ],
   [ { script: 'sub' }, { script: 'sup' } ],
-  [ 'linkstyle' ]
+  [ 'linkstyle' ],
+  { "controls": [ { "alias": "baloon", "customHandler": true, "title": "Show original text preview" } ], "class": "rFloat" }
 ];
 
 class SnowTheme extends BaseTheme {
@@ -13,6 +14,10 @@ class SnowTheme extends BaseTheme {
       options.modules.toolbar.container = TOOLBAR_CONFIG;
     }
     super(quill, options);
+
+    setTimeout(() => {
+      this.toggleBaloonState(true);
+    }, 1);
   }
 
 
@@ -25,11 +30,32 @@ class SnowTheme extends BaseTheme {
     // }
 
   }
+
+  toggleBaloonState(init) {
+    var
+      button = this.quill.container.parentNode.querySelector('.ql-baloon'),
+      baloonState = localStorage.getItem("RHEA.originalTextBaloon"),
+      data = {}
+    ;
+
+    if (!init || !baloonState) baloonState = (baloonState == "show")? "hide" : "show";
+
+    if (baloonState == "show") data.show = "show";
+    if (button) button.classList.toggle('active', baloonState == "show");
+
+    z.dispatch({ e: "baloonState", f: this.quill.container, p: "parent", data: data });
+
+    localStorage.setItem("RHEA.originalTextBaloon", baloonState);
+  }
 }
 SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
   modules: {
     toolbar: {
-      handlers: { }
+      handlers: {
+          baloon: function(value, evt) {
+            this.quill.theme.toggleBaloonState();
+          }
+      }
     }
   }
 });

@@ -111,6 +111,7 @@ class Toolbar extends Module {
     let formats = range == null ? {} : this.quill.getFormat(range);
     this.controls.forEach(function(pair) {
       let [format, input] = pair;
+      if (input.customUpdate) return;
       if (input.tagName === 'SELECT') {
         let option;
         if (range == null) {
@@ -148,8 +149,10 @@ class Toolbar extends Module {
           input.classList.toggle('active', isActive);
         } else {
           let isActive = formats[format] != null;
+
           if (format === 'image' && images && images.openedPanel != null) isActive = true;
           if (format === 'fullscreen' && body.classList.contains('fullscreenEditor')) isActive = true;
+
           input.classList.toggle('active', isActive);
         }
       }
@@ -172,26 +175,38 @@ function addButton(container, format, value) {
   }
   button.appendChild(icon);
   container.appendChild(button);
+  return button;
 }
 
 function addControls(container, groups) {
   if (!Array.isArray(groups[0])) {
     groups = [groups];
   }
-  groups.forEach(function(controls) {
+  groups.forEach(function(groupItem) {
     let group = document.createElement('span');
+    let groupControls = (groupItem.controls)? groupItem.controls : groupItem;
+
     group.classList.add('buttonGroup');
-    if (controls.indexOf('fullscreen') != -1) group.classList.add('rFloat');
-    controls.forEach(function(control) {
+    if (groupItem.class) group.classList.add(groupItem.class);
+
+    groupControls.forEach(function(control) {
+
       if (typeof control === 'string') {
         addButton(group, control);
       } else {
-        let format = Object.keys(control)[0];
-        let value = control[format];
-        if (Array.isArray(value)) {
-          addSelect(group, format, value);
+
+        if (control.customHandler) {
+          var button = addButton(group, control.alias);
+          button.customUpdate = true;
+          if (control.title) button.setAttribute("title", control.title);
         } else {
-          addButton(group, format, value);
+          let format = Object.keys(control)[0];
+          let value = control[format];
+          if (Array.isArray(value)) {
+            addSelect(group, format, value);
+          } else {
+            addButton(group, format, value);
+          }
         }
       }
     });
