@@ -5,7 +5,8 @@ const TOOLBAR_CONFIG = [
   [ 'bold', 'italic', 'underline' ],
   [ { list: 'ordered' }, { list: 'unordered' } ],
   [ { script: 'sub' }, { script: 'sup' } ],
-  [ 'link' ], [ 'image' ], [ 'fullscreen' ]
+  [ 'link' ], [ 'image' ],
+  { "controls": [ "fullscreen" ], "class": "rFloat" }
 ];
 
 class SnowTheme extends BaseTheme {
