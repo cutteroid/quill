@@ -5,7 +5,7 @@ class ObjectLink extends Embed {
 
 	constructor(domNode) {
 		super(domNode);
-		this.NotEditable = true;
+		this.immutable = true;
 		this._length = 1;
 	}
 

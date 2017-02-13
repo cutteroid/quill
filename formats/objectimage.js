@@ -10,7 +10,7 @@ class ObjectImage extends Embed {
 			tmpE = { c: tmpNode, data: value }
 		;
 
-		this.NotEditable = true;
+		this.immutable = true;
 
 		if (!value.height) value.height = 150;
 

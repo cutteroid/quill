@@ -1,11 +1,10 @@
-import Embed from '../blots/embed';
+import Immutable from '../blots/immutable';
 
-class ObjectNode extends Embed {
+class ObjectNode extends Immutable {
 
 	constructor(domNode) {
 		super(domNode);
 
-		this.NotEditable = true;
 		this._length = 1;
 	}
 

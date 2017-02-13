@@ -18,7 +18,7 @@ class Entities extends Module {
 		this.spacer = "\u200B";
 		this.filler = null;
 
-		this.fixCaret = false;
+		this.fixCaret = true;
 
 		this.listen();
 
@@ -43,6 +43,10 @@ class Entities extends Module {
 	getRange() {
 		var range = this.selection.getRange();
 		return  (range[0])? range[0] : { index: null, length: null };
+	}
+
+	setRange(index, length) {
+		this.selection.setRange(new Range(index, length));
 	}
 
 	listen() {
@@ -120,171 +124,19 @@ class Entities extends Module {
 		if (!this.fixCaret)
 			return;
 
-		var
-			downArr = [37, 39],
-			blacklist = [16, 17, 18, 48, 91, 224],
-			key = evt.which || evt.keyCode || 0,
-			type = evt.type,
-			range = this.getRange(),
-			needFix = false,
-			setRange = null,
-			fixTarget = null,
-			anchor, tIndex
-		;
+		var _this = this;
 
-		var index = (range.index !== null)? range.index : this.quill.getLength() - 1;
-
-		if (type == 'click' || type == 'keyup') {
-
-			if (type == 'keyup' && ( downArr.indexOf(key) != -1 || blacklist.indexOf(key) != -1 ) )
-				return;
-
-			if (this.filler) {
-				this.filler.remove();
-				this.filler = null;
-			}
-
-			var blots = this.getIndexBlots(index);
-
-			if (blots.a.NotEditable) {
-				fixTarget = blots.a;
-				tIndex = blots.ai;
-			}
-			else if (blots.b && blots.b.NotEditable) {
-				if (blots.b.prev == blots.a) {
-					fixTarget = blots.b;
-					tIndex = blots.bi;
-				}
-			}
-
-			if (blots.a.NotEditable && blots.b && blots.b.NotEditable && blots.a.next) {
-				fixTarget = blots.b;
-				tIndex = blots.bi;
-			}
-
-			if (blots.a.NotEditable && !blots.b) {
-				fixTarget = blots.a;
-				tIndex = null;
-			}
-
-			if (blots.a.NotEditable && !blots.a.next) {
-				fixTarget = blots.a;
-				tIndex = null;
-			}
-
-			if (blots.a.NotEditable && !blots.a.next && blots.a == blots.b) {
-				fixTarget = blots.a;
-				tIndex = 0;
-			}
-
-			if (fixTarget) {
-
-				if (tIndex == 0 || tIndex == 1) {
-					needFix = true;
-					anchor = fixTarget;
-				}
-				else {
-					if (fixTarget.next) {
-						needFix = true;
-						anchor = fixTarget.next;
-
-					} else {
-						needFix = 'append';
-						anchor = fixTarget;
-					}
-				}
-				setRange = 0;
-			}
-		}
-
-		if (type == 'keydown') {
-
-			if (this.filler) {
-				this.filler.remove();
-				this.filler = null;
-			}
-
-			if (downArr.indexOf(key) == -1)
-				return;
-
-			index = (key == 39)? index + 1 : index - 1;
-
-			var blots = this.getIndexBlots(index);
-
-			if (!blots.a && !blots.b) {
-				if (key == 39) {
-					index = range.index;
-					var blots = this.getIndexBlots(index);
-				}
-
-				if (!blots.a && !blots.b) {
-					return;
-				}
-			}
-
-			if (key == 39) { //ARR RIGHT
-
-				if (blots.a && blots.a.NotEditable && !blots.a.next) {
-					needFix = 'append';
-					anchor = blots.a;
-				}
-
-				if (blots.a == blots.b && blots.b.NotEditable) {
-					needFix = true;
-					anchor = blots.b;
-					setRange = 0;
-				}
-
-				if (blots.a && blots.b && blots.a != blots.b && blots.b.NotEditable && blots.a.next == blots.b) {
-					needFix = true;
-					anchor = blots.b;
-					setRange = 0;
-				}
-			}
-
-			if (key == 37) { //ARR LEFT
-
-				if (blots.a && blots.a.NotEditable && !blots.a.prev && (blots.a == blots.b || !blots.b)) {
-					needFix = true;
-					anchor = blots.a;
-				}
-
-				if (blots.a && blots.a.NotEditable && !blots.a.next && blots.b && blots.b != blots.a) {
-					needFix = 'append';
-					anchor = blots.a;
-				}
-
-				if (blots.a && blots.b && blots.a.NotEditable && blots.b.NotEditable && blots.a.next == blots.b) {
-					needFix = true;
-					anchor = blots.b;
-				}
-			}
-		}
-
-		if (needFix) {
-
-			var fillerBlot = Parchment.create('filler');
-
-			fillerBlot.filler = true;
-			this.filler = fillerBlot;
-
-			if (needFix === 'append')
-				anchor.parent.appendChild(fillerBlot);
-			else
-				anchor.parent.insertBefore(fillerBlot, anchor);
-
-			var _this = this;
-			if (setRange !== null) {
-				setTimeout(function(){ _this.selection.setNativeRange(fillerBlot.domNode, setRange); }, 1);
-			}
-		}
+		zEditor.fixCaret(evt, _this, Parchment);
 	}
 
 	getIndexBlots(index) {
-		var leaf1 = this.quill.scroll.leaf(index);
-		var leaf2 = this.quill.scroll.leaf(index+1);
+		var
+			leaf1 = this.quill.scroll.leaf(index),
+			leaf2 = this.quill.scroll.leaf(index+1),
+			identical = (leaf1[0] === leaf2[0])? true : false
+		;
 
-		return { a: leaf1[0], b: leaf2[0], ai: leaf1[1], bi: leaf2[1] };
+		return { a: leaf1[0], b: leaf2[0], ai: leaf1[1], bi: leaf2[1], identical: identical };
 	}
 
 	getEventCaretRange(evt) {
@@ -435,12 +287,12 @@ class Entities extends Module {
 		}
 
 		var blot = cont.__blot.blot;
-		if (blot && blot.NotEditable === true) {
+		if (blot && blot.immutable === true) {
 			return false;
 		}
 
 		var parentBlot = cont.parentNode.__blot.blot;
-		if (parentBlot && parentBlot.NotEditable === true) {
+		if (parentBlot && parentBlot.immutable === true) {
 			return false;
 		}
 

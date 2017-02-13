@@ -6,7 +6,6 @@ class Filler extends Embed {
 	constructor(domNode) {
 		super(domNode);
 		this.filler = true;
-		this.NotEditable = true;
 		this.textNode = document.createTextNode(Filler.contents);
 		this.domNode.appendChild(this.textNode);
 		this._length = 0;
@@ -26,10 +25,13 @@ class Filler extends Embed {
 	}
 
 	optimize() {
-		var node = this.textNode;
-		var text = node.data;
+		var
+			node = this.domNode,
+			text = node.textContent
+		;
+
 		if (text != Filler.contents) {
-			var textBlot = Parchment.create('text', text.split(Filler.contents).join(''));
+			var textBlot = Parchment.create('text', text.replace(Filler.contents, ''));
 			this.parent.insertBefore(textBlot, this);
 			node.textContent = Filler.contents;
 		}

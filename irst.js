@@ -9,6 +9,7 @@ import Embed from './blots/embed';
 import Inline from './blots/inline';
 import Scroll from './blots/scroll';
 import TextBlot from './blots/text';
+import Immutable from './blots/immutable';
 
 import { IndentClass as Indent } from './formats/indent';
 import List, { ListItem } from './formats/list';
@@ -59,6 +60,7 @@ Quill.register({
   'blots/inline'       : Inline,
   'blots/scroll'       : Scroll,
   'blots/text'         : TextBlot,
+  'blots/immutable'    : Immutable,
 
   'modules/clipboard'  : Clipboard,
   'modules/history'    : History,
