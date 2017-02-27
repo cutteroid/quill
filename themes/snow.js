@@ -17,15 +17,14 @@ class SnowTheme extends BaseTheme {
     super(quill, options);
   }
 
-
   // extendToolbar(toolbar) {
-    extendToolbar() {
-    // if (toolbar.container.querySelector('.ql-link')) {
-    //   this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
-    //     toolbar.handlers['link'].call(toolbar, !context.format.link);
-    //   });
-    // }
+  // if (toolbar.container.querySelector('.ql-link')) {
+  //   this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
+  //     toolbar.handlers['link'].call(toolbar, !context.format.link);
+  //   });
+  // }
 
+  extendToolbar() {
   }
 }
 SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
