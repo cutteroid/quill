@@ -43,6 +43,8 @@ class Keyboard extends Module {
       this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true, prefix: /^.?$/ }, handleBackspace);
       this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: true, suffix: /^.?$/ }, handleDelete);
     }
+    this.addBinding({ key: Keyboard.keys.BACKSPACE }, { ctrlKey: true }, function() {});
+    this.addBinding({ key: Keyboard.keys.DELETE }, { ctrlKey: true }, function() {});
     this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: false }, handleDeleteRange);
     this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: false }, handleDeleteRange);
     this.listen();
@@ -232,12 +234,13 @@ Keyboard.DEFAULTS = {
       key: ' ',
       collapsed: true,
       format: { list: false },
-      prefix: /^(1\.|-)$/,
+      prefix: /^\s*?(1\.|-)$/,
       handler: function(range, context) {
         if (this.quill.scroll.whitelist != null && !this.quill.scroll.whitelist['list']) return true;
         let length = context.prefix.length;
+        let value = context.prefix.trim().length === 1 ? 'bullet' : 'ordered'
         this.quill.scroll.deleteAt(range.index - length, length);
-        this.quill.formatLine(range.index - length, 1, 'list', length === 1 ? 'bullet' : 'ordered', Quill.sources.USER);
+        this.quill.formatLine(range.index - length, 1, 'list', value, Quill.sources.USER);
         this.quill.setSelection(range.index - length, Quill.sources.SILENT);
       }
     },

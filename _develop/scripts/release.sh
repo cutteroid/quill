@@ -15,8 +15,9 @@ mkdir .release
 mkdir .release/quill
 
 npm run build
-webpack --minimize --config _develop/webpack.config.js
-cp dist/quill.core.css dist/quill.bubble.css dist/quill.snow.css dist/quill.js dist/quill.core.js dist/quill.min.js dist/quill.min.js.map dist/quill.custom.js .release/quill/
+webpack --config _develop/webpack.config.js --env.minimize
+cp dist/quill.core.css dist/quill.bubble.css dist/quill.snow.css dist/quill.js dist/quill.core.js dist/quill.min.js dist/quill.min.js.map .release/quill/
+
 
 cd .release
 
