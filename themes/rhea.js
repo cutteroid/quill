@@ -21,14 +21,14 @@ class SnowTheme extends BaseTheme {
   }
 
 
-  // extendToolbar(toolbar) {
-    extendToolbar() {
+    // extendToolbar(toolbar) {
     // if (toolbar.container.querySelector('.ql-link')) {
     //   this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
     //     toolbar.handlers['link'].call(toolbar, !context.format.link);
     //   });
     // }
 
+  extendToolbar() {
   }
 
   toggleBaloonState(init) {
@@ -48,6 +48,7 @@ class SnowTheme extends BaseTheme {
     localStorage.setItem("RHEA.originalTextBaloon", baloonState);
   }
 }
+
 SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
   modules: {
     toolbar: {

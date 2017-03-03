@@ -23,6 +23,7 @@ import Keyboard from './modules/keyboard';
 import SnowTheme from './themes/rhea';
 import Toolbar from './modules/toolbar';
 
+import SaveState from './modules/savestate';
 
 Quill.register({
 
@@ -45,10 +46,12 @@ Quill.register({
   'modules/clipboard'  : Clipboard,
   'modules/history'    : History,
   'modules/keyboard'   : Keyboard,
+  'modules/savestate'  : SaveState,
 
   'themes/snow'        : SnowTheme,
 
   'modules/toolbar'    : Toolbar
+
 });
 
 Parchment.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
