@@ -349,16 +349,6 @@ class Quill {
       return this.editor.applyDelta(delta, source);
     }, source, true);
   }
-
-  fullscreenMode() {
-    var body = this.root.ownerDocument.body;
-
-    if (body.classList.contains('fullscreenEditor')) {
-      body.classList.remove('fullscreenEditor');
-    } else {
-      body.classList.add('fullscreenEditor');
-    }
-  }
 }
 Quill.DEFAULTS = {
   bounds: null,

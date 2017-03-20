@@ -65,7 +65,7 @@ class Toolbar extends Module {
         return;
       }
     }
-    let eventName = input.tagName === 'SELECT' ? 'change' : 'click';
+    let eventName = input.tagName === 'SELECT' ? 'change' : 'mousedown';
     input.addEventListener(eventName, (e) => {
       let value;
       if (input.tagName === 'SELECT') {
@@ -279,7 +279,7 @@ Toolbar.DEFAULTS = {
     },
 
     fullscreen: function(value, evt) {
-      this.quill.fullscreenMode(evt);
+      this.quill.theme.fullscreenMode(evt);
     },
 
     list: function(value) {

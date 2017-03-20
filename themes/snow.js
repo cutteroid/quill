@@ -26,6 +26,19 @@ class SnowTheme extends BaseTheme {
 
   extendToolbar() {
   }
+
+  fullscreenMode() {
+    var body = this.quill.root.ownerDocument.body;
+
+    if (body.classList.contains('fullscreenEditor')) {
+      body.classList.remove('fullscreenEditor');
+      body.scrollTop = body.__scrollTop;
+      delete body.__scrollTop;
+    } else {
+      body.__scrollTop = body.scrollTop;
+      body.classList.add('fullscreenEditor');
+    }
+  }
 }
 SnowTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
   modules: {
