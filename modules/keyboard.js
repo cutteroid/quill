@@ -42,11 +42,11 @@ class Keyboard extends Module {
       this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true, prefix: /^.?$/ }, handleBackspace);
       this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: true, suffix: /^.?$/ }, handleDelete);
     }
-    // this.addBinding({ key: Keyboard.keys.BACKSPACE }, { ctrlKey: true }, function() {});
-    // this.addBinding({ key: Keyboard.keys.DELETE }, { ctrlKey: true }, function() {});
     this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: false }, handleDeleteRange);
     this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: false }, handleDeleteRange);
-    this.addBinding({ key: Keyboard.keys.BACKSPACE }, { empty: true, shortKey: true }, handleBackspace);
+    this.addBinding({ key: Keyboard.keys.BACKSPACE, altKey: null, ctrlKey: null, metaKey: null, shiftKey: null },
+                    { collapsed: true, offset: 0 },
+                    handleBackspace);
     this.listen();
   }
 
@@ -160,6 +160,10 @@ Keyboard.DEFAULTS = {
     'outdent backspace': {
       key: Keyboard.keys.BACKSPACE,
       collapsed: true,
+      shiftKey: null,
+      metaKey: null,
+      ctrlKey: null,
+      altKey: null,
       format: ['blockquote', 'indent', 'list'],
       offset: 0,
       handler: function(range, context) {
@@ -234,13 +238,13 @@ Keyboard.DEFAULTS = {
       key: ' ',
       collapsed: true,
       format: { list: false },
-      prefix: /^\s*?(1\.|-|\[ \]|\[x\])$/,
+      prefix: /^\s*?(1\.|-|\[ ?\]|\[x\])$/,
       handler: function(range, context) {
         if (this.quill.scroll.whitelist != null && !this.quill.scroll.whitelist['list']) return true;
         let length = context.prefix.length;
         let value;
         switch (context.prefix.trim()) {
-          case '[ ]':
+          case '[]': case '[ ]':
             value = 'unchecked';
             break;
           case '[x]':
@@ -277,9 +281,12 @@ function handleBackspace(range, context) {
   let [line, ] = this.quill.getLine(range.index);
   let formats = {};
   if (context.offset === 0) {
-    let curFormats = line.formats();
-    let prevFormats = this.quill.getFormat(range.index-1, 1);
-    formats = DeltaOp.attributes.diff(curFormats, prevFormats) || {};
+    let [prev, ] = this.quill.getLine(range.index - 1);
+    if (prev != null && prev.length() > 1) {
+      let curFormats = line.formats();
+      let prevFormats = this.quill.getFormat(range.index-1, 1);
+      formats = DeltaOp.attributes.diff(curFormats, prevFormats) || {};
+    }
   }
   // Check for astral symbols
   let length = /[\uD800-\uDBFF][\uDC00-\uDFFF]$/.test(context.prefix) ? 2 : 1;
@@ -294,7 +301,21 @@ function handleDelete(range, context) {
   // Check for astral symbols
   let length = /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(context.suffix) ? 2 : 1;
   if (range.index >= this.quill.getLength() - length) return;
+  let formats = {}, nextLength = 0;
+  let [line, ] = this.quill.getLine(range.index);
+  if (context.offset >= line.length() - 1) {
+    let [next, ] = this.quill.getLine(range.index + 1);
+    if (next) {
+      let curFormats = line.formats();
+      let nextFormats = this.quill.getFormat(range.index, 1);
+      formats = DeltaOp.attributes.diff(curFormats, nextFormats) || {};
+      nextLength = next.length();
+    }
+  }
   this.quill.deleteText(range.index, length, Quill.sources.USER);
+  if (Object.keys(formats).length > 0) {
+    this.quill.formatLine(range.index + nextLength - 1, length, formats, Quill.sources.USER);
+  }
 }
 
 function handleDeleteRange(range) {
