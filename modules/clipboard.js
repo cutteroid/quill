@@ -1,3 +1,4 @@
+import extend from 'extend';
 import Delta from 'quill-delta';
 import Parchment from 'parchment';
 import Quill from '../core/quill';
@@ -18,12 +19,14 @@ const DOM_KEY = '__ql-matcher';
 
 const CLIPBOARD_CONFIG = [
   [Node.TEXT_NODE, matchText],
+  [Node.TEXT_NODE, matchNewline],
   ['br', matchBreak],
   [Node.ELEMENT_NODE, matchNewline],
   [Node.ELEMENT_NODE, matchBlot],
   [Node.ELEMENT_NODE, matchSpacing],
   [Node.ELEMENT_NODE, matchAttributor],
   [Node.ELEMENT_NODE, matchStyles],
+  ['li', matchIndent],
   ['b', matchAlias.bind(matchAlias, 'bold')],
   ['i', matchAlias.bind(matchAlias, 'italic')],
   ['style', matchIgnore]
@@ -69,7 +72,7 @@ class Clipboard extends Module {
 
   convert(html) {
     if (typeof html === 'string') {
-      this.container.innerHTML = html;
+      this.container.innerHTML = html.replace(/\>\r?\n +\</g, '><'); // Remove spaces between tags
     }
     let [elementMatchers, textMatchers] = this.prepareMatching();
     let delta = traverse(this.container, elementMatchers, textMatchers);
@@ -136,6 +139,22 @@ Clipboard.DEFAULTS = {
 };
 
 
+function applyFormat(delta, format, value) {
+  if (typeof format === 'object') {
+    return Object.keys(format).reduce(function(delta, key) {
+      return applyFormat(delta, key, format[key]);
+    }, delta);
+  } else {
+    return delta.reduce(function(delta, op) {
+      if (op.attributes && op.attributes[format]) {
+        return delta.push(op);
+      } else {
+        return delta.insert(op.insert, extend({}, {[format]: value}, op.attributes));
+      }
+    }, new Delta());
+  }
+}
+
 function computeStyle(node) {
   if (node.nodeType !== Node.ELEMENT_NODE) return {};
   const DOM_KEY = '__ql-computed-style';
@@ -183,7 +202,7 @@ function traverse(node, elementMatchers, textMatchers) {  // Post-order
 
 
 function matchAlias(format, node, delta) {
-  return delta.compose(new Delta().retain(delta.length(), { [format]: true }));
+  return applyFormat(delta, format, true);
 }
 
 function matchAttributor(node, delta) {
@@ -207,7 +226,7 @@ function matchAttributor(node, delta) {
     }
   });
   if (Object.keys(formats).length > 0) {
-    delta = delta.compose(new Delta().retain(delta.length(), formats));
+    delta = applyFormat(delta, formats);
   }
   return delta;
 }
@@ -223,8 +242,7 @@ function matchBlot(node, delta) {
       delta = new Delta().insert(embed, match.formats(node));
     }
   } else if (typeof match.formats === 'function') {
-    let formats = { [match.blotName]: match.formats(node) };
-    delta = delta.compose(new Delta().retain(delta.length(), formats));
+    delta = applyFormat(delta, match.blotName, match.formats(node));
   }
   return delta;
 }
@@ -240,9 +258,27 @@ function matchIgnore() {
   return new Delta();
 }
 
+function matchIndent(node, delta) {
+  let match = Parchment.query(node);
+  if (match == null || match.blotName !== 'list-item' || !deltaEndsWith(delta, '\n')) {
+    return delta;
+  }
+  let indent = -1, parent = node.parentNode;
+  while (!parent.classList.contains('ql-clipboard')) {
+    if ((Parchment.query(parent) || {}).blotName === 'list') {
+      indent += 1;
+    }
+    parent = parent.parentNode;
+  }
+  if (indent <= 0) return delta;
+  return delta.compose(new Delta().retain(delta.length() - 1).retain(1, { indent: indent}));
+}
+
 function matchNewline(node, delta) {
-  if (isLine(node) && !deltaEndsWith(delta, '\n')) {
-    delta.insert('\n');
+  if (!deltaEndsWith(delta, '\n')) {
+    if (isLine(node) || (delta.length() > 0 && node.nextSibling && isLine(node.nextSibling))) {
+      delta.insert('\n');
+    }
   }
   return delta;
 }
@@ -267,7 +303,7 @@ function matchStyles(node, delta) {
     formats.bold = true;
   }
   if (Object.keys(formats).length > 0) {
-    delta = delta.compose(new Delta().retain(delta.length(), formats));
+    delta = applyFormat(delta, formats);
   }
   if (parseFloat(style.textIndent || 0) > 0) {  // Could be 0.5in
     delta = new Delta().insert('\t').concat(delta);
@@ -280,6 +316,9 @@ function matchText(node, delta) {
   // Word represents empty line with <o:p>&nbsp;</o:p>
   if (node.parentNode.tagName === 'O:P') {
     return delta.insert(text.trim());
+  }
+  if (text.trim().length === 0 && node.parentNode.classList.contains('ql-clipboard')) {
+    return delta;
   }
   if (!computeStyle(node.parentNode).whiteSpace.startsWith('pre')) {
     // eslint-disable-next-line func-style
