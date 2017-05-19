@@ -134,6 +134,45 @@ class Selection {
     if (selection == null || selection.rangeCount <= 0) return null;
     let nativeRange = selection.getRangeAt(0);
     if (nativeRange == null) return null;
+    let range = this.normalizeNative(nativeRange);
+    debug.info('getNativeRange', range);
+    return range;
+  }
+
+  getRange() {
+    let normalized = this.getNativeRange();
+    if (normalized == null) return [null, null];
+    let range = this.normalizedToRange(normalized);
+    return [range, normalized];
+  }
+
+  hasFocus() {
+    return document.activeElement === this.root;
+  }
+
+  normalizedToRange(range) {
+    let positions = [[range.start.node, range.start.offset]];
+    if (!range.native.collapsed) {
+      positions.push([range.end.node, range.end.offset]);
+    }
+    let indexes = positions.map((position) => {
+      let [node, offset] = position;
+      let blot = Parchment.find(node, true);
+      let index = blot.offset(this.scroll);
+      if (offset === 0) {
+        return index;
+      } else if (blot instanceof Parchment.Container) {
+        return index + blot.length();
+      } else {
+        return index + blot.index(node, offset);
+      }
+    });
+    let end = Math.min(Math.max(...indexes), this.scroll.length() - 1);
+    let start = Math.min(end, ...indexes);
+    return new Range(start, end-start);
+  }
+
+  normalizeNative(nativeRange) {
     if (!contains(this.root, nativeRange.startContainer) ||
         (!nativeRange.collapsed && !contains(this.root, nativeRange.endContainer))) {
       return null;
@@ -158,36 +197,23 @@ class Selection {
       }
       position.node = node, position.offset = offset;
     });
-    debug.info('getNativeRange', range);
     return range;
   }
 
-  getRange() {
-    let range = this.getNativeRange();
-    if (range == null) return [null, null];
-    let positions = [[range.start.node, range.start.offset]];
-    if (!range.native.collapsed) {
-      positions.push([range.end.node, range.end.offset]);
-    }
-    let indexes = positions.map((position) => {
-      let [node, offset] = position;
-      let blot = Parchment.find(node, true);
-      let index = blot.offset(this.scroll);
-      if (offset === 0) {
-        return index;
-      } else if (blot instanceof Parchment.Container) {
-        return index + blot.length();
-      } else {
-        return index + blot.index(node, offset);
-      }
+  rangeToNative(range) {
+    let indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+    let args = [];
+    let scrollLength = this.scroll.length();
+    indexes.forEach((index, i) => {
+      index = Math.min(scrollLength - 1, index);
+      let node, [leaf, offset] = this.scroll.leaf(index);
+      [node, offset] = leaf.position(offset, i !== 0);
+      args.push(node, offset);
     });
-    let start = Math.min(...indexes), end = Math.max(...indexes);
-    end = Math.min(end, this.scroll.length() - 1);
-    return [new Range(start, end-start), range];
-  }
-
-  hasFocus() {
-    return document.activeElement === this.root;
+    if (args.length < 2) {
+      args = args.concat(args);
+    }
+    return args;
   }
 
   scrollIntoView(range = this.lastRange) {
@@ -254,18 +280,7 @@ class Selection {
     }
     debug.info('setRange', range);
     if (range != null) {
-      let indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
-      let args = [];
-      let scrollLength = this.scroll.length();
-      indexes.forEach((index, i) => {
-        index = Math.min(scrollLength - 1, index);
-        let node, [leaf, offset] = this.scroll.leaf(index);
-        [node, offset] = leaf.position(offset, i !== 0);
-        args.push(node, offset);
-      });
-      if (args.length < 2) {
-        args = args.concat(args);
-      }
+      let args = this.rangeToNative(range);
       this.setNativeRange(...args, force);
     } else {
       this.setNativeRange(null);
