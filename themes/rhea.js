@@ -20,15 +20,12 @@ class SnowTheme extends BaseTheme {
     }, 1);
   }
 
-
-    // extendToolbar(toolbar) {
-    // if (toolbar.container.querySelector('.ql-link')) {
-    //   this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function(range, context) {
-    //     toolbar.handlers['link'].call(toolbar, !context.format.link);
-    //   });
-    // }
-
-  extendToolbar() {
+  extendToolbar(toolbar) {
+    if (toolbar.container.querySelector('.ql-linkstyle')) {
+      this.quill.keyboard.addBinding({ key: 'L', shortKey: true }, function(range, context) {
+        this.quill.format("linkstyle", !context.format["linkstyle"], Quill.sources.USER);
+      });
+    }
   }
 
   toggleBaloonState(init) {
