@@ -212,13 +212,7 @@ class BaseTooltip extends Tooltip {
         break;
       }
       case 'video': {
-        let match = value.match(/^(https?):\/\/(www\.)?youtube\.com\/watch.*v=([a-zA-Z0-9_-]+)/) ||
-                    value.match(/^(https?):\/\/(www\.)?youtu\.be\/([a-zA-Z0-9_-]+)/);
-        if (match) {
-          value = match[1] + '://www.youtube.com/embed/' + match[3] + '?showinfo=0';
-        } else if (match = value.match(/^(https?):\/\/(www\.)?vimeo\.com\/(\d+)/)) {  // eslint-disable-line no-cond-assign
-          value = match[1] + '://player.vimeo.com/video/' + match[3] + '/';
-        }
+        value = extractVideoUrl(value);
       } // eslint-disable-next-line no-fallthrough
       case 'formula': {
         if (!value) break;
@@ -240,6 +234,18 @@ class BaseTooltip extends Tooltip {
   }
 }
 
+
+function extractVideoUrl(url) {
+  let match = url.match(/^(https?):\/\/(?:(?:www|m)\.)?youtube\.com\/watch.*v=([a-zA-Z0-9_-]+)/) ||
+              url.match(/^(https?):\/\/(?:(?:www|m)\.)?youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (match) {
+    return match[1] + '://www.youtube.com/embed/' + match[2] + '?showinfo=0';
+  }
+  if (match = url.match(/^(https?):\/\/(?:www\.)?vimeo\.com\/(\d+)/)) {  // eslint-disable-line no-cond-assign
+    return match[1] + '://player.vimeo.com/video/' + match[2] + '/';
+  }
+  return url;
+}
 
 function fillSelect(select, values, defaultValue = false) {
   values.forEach(function(value) {
