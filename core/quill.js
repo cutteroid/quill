@@ -74,6 +74,7 @@ class Quill {
 
     this.root = this.addContainer('editable');
     this.root.classList.add('isBlank');
+    this.root.setAttribute('data-gramm', false);
 
     this.container.__quill = this;
 

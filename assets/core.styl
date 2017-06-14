@@ -73,15 +73,20 @@ resets(arr)
     content: '\2610'
   li::before
     display: inline-block
-    margin-right: LIST_STYLE_MARGIN
-    text-align: right
     white-space: nowrap
     width: LIST_STYLE_WIDTH
   li:not(.ql-direction-rtl)::before
     margin-left: -1*LIST_STYLE_OUTER_WIDTH
+    margin-right: LIST_STYLE_MARGIN
+    text-align: right
+  li.ql-direction-rtl::before
+    margin-left: LIST_STYLE_MARGIN
+    margin-right: -1*LIST_STYLE_OUTER_WIDTH
   ol, ul
-    li
+    li:not(.ql-direction-rtl)
       padding-left: LIST_STYLE_OUTER_WIDTH
+    li.ql-direction-rtl
+      padding-right: LIST_STYLE_OUTER_WIDTH
   ol
     li
       counter-reset: resets(1..MAX_INDENT)
