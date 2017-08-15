@@ -83,7 +83,6 @@ class Quill {
     this.emitter = new Emitter();
     this.scroll = Parchment.create(this.root, {
       emitter: this.emitter,
-      scrollingContainer: this.scrollingContainer,
       whitelist: this.options.formats
     });
     this.emitter.sources = Emitter.sources;
@@ -164,7 +163,7 @@ class Quill {
     let scrollTop = this.scrollingContainer.scrollTop;
     this.selection.focus();
     this.scrollingContainer.scrollTop = scrollTop;
-    this.selection.scrollIntoView();
+    this.scrollIntoView();
   }
 
   format(name, value, source = Emitter.sources.API) {
@@ -317,6 +316,10 @@ class Quill {
     }, source, index);
   }
 
+  scrollIntoView() {
+    this.selection.scrollIntoView(this.scrollingContainer);
+  }
+
   setContents(delta, source = Emitter.sources.API) {
     return modify.call(this, () => {
       delta = new Delta(delta);
@@ -339,9 +342,9 @@ class Quill {
     } else {
       [index, length, , source] = overload(index, length, source);
       this.selection.setRange(new Range(index, length), source);
-    }
-    if (source !== Emitter.sources.SILENT) {
-      this.selection.scrollIntoView();
+      if (source !== Emitter.sources.SILENT) {
+        this.selection.scrollIntoView(this.scrollingContainer);
+      }
     }
   }
 

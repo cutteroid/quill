@@ -39,5 +39,4 @@ BaseTheme.DEFAULTS = extend(true, {}, Theme.DEFAULTS, {
   }
 });
 
-
 export default BaseTheme;
