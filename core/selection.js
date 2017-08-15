@@ -1,5 +1,5 @@
 import Parchment from 'parchment';
-import { InlineEmbed } from '../blots/embed';
+import Embed from '../blots/embed';
 import clone from 'clone';
 import equal from 'deep-equal';
 import Emitter from './emitter';
@@ -27,6 +27,13 @@ class Selection {
     });
     this.root.addEventListener('compositionend', () => {
       this.composing = false;
+      if (this.cursor.parent) {
+        const range = this.cursor.restore();
+        if (!range) return;
+        setTimeout(() => {
+          this.setNativeRange(range.startNode, range.startOffset, range.endNode, range.endOffset);
+        }, 1);
+      }
     });
     this.cursor = Parchment.create('cursor', this);
     // savedRange is last non-null range
@@ -44,8 +51,20 @@ class Selection {
         e.stopPropagation();
       }
     });
+    let mouseCount = 0;
+    this.emitter.listenDOM('mousedown', document.body, () => {
+      mouseCount += 1;
+    });
+    this.emitter.listenDOM('mouseup', document.body, () => {
+      mouseCount -= 1;
+      if (mouseCount === 0) {
+        this.update(Emitter.sources.USER);
+      }
+    });
     this.emitter.listenDOM('selectionchange', document, () => {
-      setTimeout(this.update.bind(this, Emitter.sources.USER), 1);
+      if (mouseCount === 0) {
+        setTimeout(this.update.bind(this, Emitter.sources.USER), 1);
+      }
     });
     this.emitter.on(Emitter.events.EDITOR_CHANGE, (type, delta) => {
       if (type === Emitter.events.TEXT_CHANGE && delta.length() > 0) {
@@ -77,7 +96,7 @@ class Selection {
     if (native == null) return;
     const [start, end] = [native.start, native.end].map(function(pos) {
       const blot = Parchment.find(pos.node, true);
-      if (blot instanceof InlineEmbed) {
+      if (blot instanceof Embed) {
         let node, offset;
         if (pos.node === blot.leftGuard && pos.offset === 1) {
           [node, offset] = blot.position(blot.length());
