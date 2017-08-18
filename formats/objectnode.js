@@ -1,6 +1,6 @@
-import Immutable from '../blots/immutable';
+import Embed from '../blots/embed';
 
-class ObjectNode extends Immutable {
+class ObjectNode extends Embed {
 
 	constructor(domNode) {
 		super(domNode);
@@ -22,7 +22,7 @@ class ObjectNode extends Immutable {
 
 		node.setAttribute('data-uid', value.uid);
 		node.setAttribute('data-object', value.object);
-		node.setAttribute('contenteditable', 'false');
+		// node.setAttribute('contenteditable', 'false');
 
 		if (value.index) node.setAttribute('index', value.index);
 		if (value.is_new) node.classList.add('new');

@@ -15,10 +15,10 @@ class Entities extends Module {
 		this.document = this.quill.root.ownerDocument;
 		this.dzID = "dropZone";
 		this.entityPopup = null;
-		this.spacer = "\u200B";
+		this.spacer = "";
 		this.filler = null;
 
-		this.fixCaret = true;
+		this.fixCaret = false;
 
 		this.listen();
 
