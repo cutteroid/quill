@@ -21,48 +21,16 @@ class Selection {
     this.emitter = emitter;
     this.scroll = scroll;
     this.composing = false;
+    this.mouseDown = false;
     this.root = this.scroll.domNode;
-    this.root.addEventListener('compositionstart', () => {
-      this.composing = true;
-    });
-    this.root.addEventListener('compositionend', () => {
-      this.composing = false;
-      if (this.cursor.parent) {
-        const range = this.cursor.restore();
-        if (!range) return;
-        setTimeout(() => {
-          this.setNativeRange(range.startNode, range.startOffset, range.endNode, range.endOffset);
-        }, 1);
-      }
-    });
     this.cursor = Parchment.create('cursor', this);
     // savedRange is last non-null range
     this.lastRange = this.savedRange = new Range(0, 0);
-    this.root.addEventListener('click', (e) => {
-      const blot = Parchment.find(e.target, true);
-      const selectedNode = document.querySelector('.ql-embed-selected');
-      if (selectedNode) {
-        selectedNode.classList.remove('ql-embed-selected');
-      }
-      if (blot instanceof Parchment.Embed) {
-        blot.domNode.classList.add('ql-embed-selected');
-        const range = new Range(blot.offset(scroll), blot.length());
-        this.setRange(range, Emitter.sources.USER);
-        e.stopPropagation();
-      }
-    });
-    let mouseCount = 0;
-    this.emitter.listenDOM('mousedown', document.body, () => {
-      mouseCount += 1;
-    });
-    this.emitter.listenDOM('mouseup', document.body, () => {
-      mouseCount -= 1;
-      if (mouseCount === 0) {
-        this.update(Emitter.sources.USER);
-      }
-    });
+    this.handleComposition();
+    this.handleDragging();
+    this.handleEmbedSelection();
     this.emitter.listenDOM('selectionchange', document, () => {
-      if (mouseCount === 0) {
+      if (!this.mouseDown) {
         setTimeout(this.update.bind(this, Emitter.sources.USER), 1);
       }
     });
@@ -111,6 +79,49 @@ class Selection {
     if (native.start !== start || native.end !== end) {
       this.setNativeRange(start.node, start.offset, end.node, end.offset);
     }
+  }
+
+  handleComposition() {
+    this.root.addEventListener('compositionstart', () => {
+      this.composing = true;
+    });
+    this.root.addEventListener('compositionend', () => {
+      this.composing = false;
+      if (this.cursor.parent) {
+        const range = this.cursor.restore();
+        if (!range) return;
+        setTimeout(() => {
+          this.setNativeRange(range.startNode, range.startOffset, range.endNode, range.endOffset);
+        }, 1);
+      }
+    });
+  }
+
+  handleDragging() {
+    this.emitter.listenDOM('mousedown', document.body, () => {
+      this.mouseDown = true;
+    });
+    this.emitter.listenDOM('mouseup', document.body, () => {
+      this.mouseDown = false;
+      this.update(Emitter.sources.USER);
+    });
+  }
+
+  handleEmbedSelection() {
+    this.emitter.on(Emitter.events.SELECTION_CHANGE, () => {
+      const selectedNode = document.querySelector('.ql-embed-selected');
+      if (selectedNode) {
+        selectedNode.classList.remove('ql-embed-selected');
+      }
+    });
+    this.root.addEventListener('click', (e) => {
+      const blot = Parchment.find(e.target, true);
+      if (blot instanceof Parchment.Embed) {
+        const range = new Range(blot.offset(scroll), blot.length());
+        this.setRange(range, Emitter.sources.USER);
+        blot.domNode.classList.add('ql-embed-selected');
+      }
+    });
   }
 
   focus() {
