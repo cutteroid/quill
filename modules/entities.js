@@ -173,7 +173,7 @@ class Entities extends Module {
 
 	handleMouseUp(evt) {
 		var target = evt.target;
-		if (target.__blot && target.classList.contains('objectLink')) {
+		if (target.__blot && target.parentNode.classList.contains('objectLink')) {
 			this.openLinkDialog(evt, target.__blot.blot);
 			evt.preventDefault();
 			evt.stopPropagation();

@@ -17,6 +17,8 @@ class Embed extends Parchment.Embed {
     this.domNode.appendChild(this.leftGuard);
     this.domNode.appendChild(wrapper);
     this.domNode.appendChild(this.rightGuard);
+    this.wrapper = wrapper;
+    this.domNode.__wrapper = wrapper;
   }
 
   index(node, offset) {
