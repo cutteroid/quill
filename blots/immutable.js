@@ -1,5 +1,4 @@
 import Embed from '../blots/embed';
-import Parchment from 'parchment';
 
 class Immutable extends Embed {
 

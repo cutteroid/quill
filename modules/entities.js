@@ -117,6 +117,11 @@ class Entities extends Module {
 		this.quill.root.addEventListener('drop', function(evt) {
 			_this.handleDrop(evt);
 		});
+
+		this.quill.theme.modules.toolbar.container.addEventListener('mouseup', function (evt) {
+			_this.handleMouseUp(evt, 'ql-link');
+		});
+
 	}
 
 	fixCaretPosition(evt) { // FIX caret positioning in various cases
@@ -171,9 +176,17 @@ class Entities extends Module {
 		}
 	}
 
-	handleMouseUp(evt) {
-		var target = evt.target;
-		if (target.__blot && target.parentNode.classList.contains('objectLink')) {
+	handleMouseUp(evt, exclude) {
+		if (exclude) {
+			if ( evt.target.classList.contains(exclude) || evt.target.parentNode.classList.contains(exclude) ) {
+				evt.stopPropagation();
+				evt.preventDefault();
+				return;
+			}
+		}
+
+		var target = evt.target.parentNode;
+		if (target.__blot && target.classList.contains('objectLink')) {
 			this.openLinkDialog(evt, target.__blot.blot);
 			evt.preventDefault();
 			evt.stopPropagation();
@@ -395,6 +408,7 @@ class Entities extends Module {
 
 		// this.quill.entities.hidePopups();
 		zEditor.EntityPopup.hidePopups();
+		this.hideEditorPopup();
 
 		if (blot) {
 			target = blot.domNode;
@@ -437,6 +451,8 @@ class Entities extends Module {
 		if (!popup)
 			return;
 
+		this.openedPopup = popup;
+
 		x = target.offsetLeft + xOffset;
 		y = target.offsetTop + target.offsetHeight - yOffset;
 
@@ -457,6 +473,16 @@ class Entities extends Module {
 				_this.handleLinkRemove(popup, blot);
 			});
 		}
+	}
+
+	hideEditorPopup() {
+		var res = false;
+		if (this.openedPopup) {
+			if (this.openedPopup.parentNode) this.openedPopup.parentNode.removeChild(this.openedPopup);
+			this.openedPopup = null;
+			res = true;
+		}
+		return res;
 	}
 
 	handleLinkSave(popup, range, blot) {

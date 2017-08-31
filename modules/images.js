@@ -279,14 +279,15 @@ class Images extends Module {
 
 		var
 			y = evt.clientY - this.resizingData.startY,
-			newHeight = this.resizingData.startHeight + y
+			newHeight = this.resizingData.startHeight + y,
+			cont = this.resizingData.imgNode.querySelector(".oiContainer")
 		;
 
 		if (newHeight <  Images.minImageHeight) newHeight =  Images.minImageHeight;
 		if (newHeight > this.resizingData.imgNode.offsetWidth) newHeight = this.resizingData.imgNode.offsetWidth; // is this check needed?
 
 		this.resizingData.newHeight = newHeight;
-		this.resizingData.imgNode.style.height = newHeight + 'px';
+		cont.style.height = newHeight + 'px';
 	}
 }
 

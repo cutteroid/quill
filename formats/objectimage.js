@@ -1,6 +1,6 @@
-import Embed from '../blots/embed';
+import Immutable from '../blots/immutable';
 
-class ObjectImage extends Embed {
+class ObjectImage extends Immutable {
 
 	static create(value) {
 
@@ -9,8 +9,6 @@ class ObjectImage extends Embed {
 			tmpNode = document.createElement('div'),
 			tmpE = { c: tmpNode, data: value }
 		;
-
-		this.immutable = true;
 
 		if (!value.height) value.height = 150;
 
