@@ -33,11 +33,11 @@ class ObjectNode extends Immutable {
 		node.innerText = value.text;
 
 		node.addEventListener('mouseover', function (evt) {
-			zEditor.Utils.handleEntityHover(evt);
+			zEditor.Utils.handleEntityHover(evt, node);
 		});
 
 		node.addEventListener('mouseout', function (evt) {
-			zEditor.Utils.handleEntityHover(evt);
+			zEditor.Utils.handleEntityHover(evt, node);
 		});
 
 		return node;
