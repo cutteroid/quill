@@ -10,6 +10,7 @@ class Images extends Module {
 		this.document = this.quill.root.ownerDocument;
 		this.openedPanel = null;
 		this.openedTools = null;
+		this.savedRange = {};
 
 		this.listen();
 	}
@@ -61,7 +62,8 @@ class Images extends Module {
 			return;
 		}
 
-		// this.quill.entities.hidePopups();
+		this.savedRange = this.getRange();
+
 		zEditor.EntityPopup.hidePopups();
 
 		z.dispatch(	{ e: "collectImagesData", f: target, p: ".filePreview", data: data } );
@@ -80,8 +82,6 @@ class Images extends Module {
 
 		this.openedPanel.button = eTarget;
 		eTarget.classList.add('active');
-
-		var images = list.querySelectorAll('.imageBox[style]');
 
 		var _this = this;
 		list.addEventListener('click', function(evt) {
@@ -103,8 +103,13 @@ class Images extends Module {
 		z.dispatch(	{ e: "collectAsObj", f: image, p: "HIDDEN", data: data } );
 
 		try {
-			this.quill.focus();
-			range = this.getRange();
+			if (this.savedRange && this.savedRange.hasOwnProperty("index")) {
+				range = this.savedRange;
+			} else {
+				this.quill.focus();
+				range = this.getRange();
+			}
+
 			this.quill.insertEmbed(range.index, 'objectimage', data, Emitter.sources.USER);
 			if (this.openedPanel) {
 				this.closeImagePanel();
@@ -118,6 +123,7 @@ class Images extends Module {
 		this.openedPanel.parentNode.removeChild(this.openedPanel);
 		this.openedPanel.button.classList.remove('active');
 		this.openedPanel = null;
+		this.savedRange = {};
 	}
 
 	openImageTools(evt, imgNode) {
