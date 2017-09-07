@@ -283,14 +283,15 @@ function matchIndent(node, delta) {
     return delta;
   }
   let indent = -1, parent = node.parentNode;
-  while (!parent.classList.contains('ql-clipboard')) {
+
+  while (parent && parent.classList && !parent.classList.contains('ql-clipboard')) {
     if ((Parchment.query(parent) || {}).blotName === 'list') {
       indent += 1;
     }
     parent = parent.parentNode;
   }
   if (indent <= 0) return delta;
-  return delta.compose(new Delta().retain(delta.length() - 1).retain(1, { indent: indent}));
+  return delta.compose(new Delta().retain(delta.length() - 1).retain(1, {indent: indent}));
 }
 
 function matchNewline(node, delta) {

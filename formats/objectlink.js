@@ -23,7 +23,7 @@ class ObjectLink extends Embed {
 	static value(domNode) {
 		var format = {
 			"min": domNode.getAttribute('href'),
-			"original": domNode.getAttribute('data-original'),
+			"original": (domNode.hasAttribute('data-original'))? domNode.getAttribute('data-original') : domNode.getAttribute('href'),
 			"contenteditable": false,
 			"text": domNode.textContent,
 			"length": domNode.textContent.length
