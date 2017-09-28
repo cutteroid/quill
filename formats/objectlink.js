@@ -1,21 +1,24 @@
-import Inline from '../blots/inline';
-import Embed from '../blots/embed';
+// import Inline from '../blots/inline';
+// import Embed from '../blots/embed';
+import Immutable from '../blots/immutable';
 
-class ObjectLink extends Embed {
+class ObjectLink extends Immutable {
 
 	constructor(domNode) {
 		super(domNode);
-		this.immutable = true;
-		this._length = 1;
+		// this.immutable = true;
+		// this._length = 1;
 	}
 
 	static create(value) {
-		var node = Inline.create.call(this, value.text);
+		// var node = Inline.create.call(this, value.text);
+		let node = super.create(value.text);
+
 		node.setAttribute('href', value.min);
 		node.setAttribute('data-original', value.original);
 		node.setAttribute('target', '_blank');
 		node.setAttribute('title', value.text);
-		node.setAttribute('contenteditable', 'false');
+		// node.setAttribute('contenteditable', 'false');
 		node.textContent = value.text;
 		return node;
 	}

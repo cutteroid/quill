@@ -6,10 +6,10 @@ class ObjectNode extends Immutable {
 		super(domNode);
 
 		if (this.domNode.hasAttribute("type")) {
-			this.wrapper.setAttribute('type', this.domNode.getAttribute("type"));
-			this.wrapper.setAttribute('icon', this.domNode.getAttribute("type"));
+			this.contentNode.setAttribute('type', this.domNode.getAttribute("type"));
+			this.contentNode.setAttribute('icon', this.domNode.getAttribute("type"));
 		}
-		if (this.domNode.hasAttribute("index")) this.wrapper.setAttribute('index', this.domNode.getAttribute("index"));
+		if (this.domNode.hasAttribute("index")) this.contentNode.setAttribute('index', this.domNode.getAttribute("index"));
 	}
 
 	static create(value) {

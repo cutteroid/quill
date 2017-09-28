@@ -24,6 +24,10 @@ class Entities extends Module {
 
 		this.quill.clipboard.preprocess.push(this.cleanObjectNodes);
 
+		this.quill.root.addEventListener('scroll', function() {
+			if (_this.entityPopup) zEditor.EntityPopup.fixPopupPosition(_this.entityPopup);
+		});
+
 		this.quill.on('CONTENTS-CHANGE', function(node) {
 			_this.initRefresh(node);
 		});
@@ -53,32 +57,30 @@ class Entities extends Module {
 
 		var _this = this;
 
-		this.quill.root.addEventListener('keypress', function(evt) {
+		if (this.quill.theme.options.formats.indexOf('objectnode') !== -1 ) {
+			this.quill.root.addEventListener('keypress', function(evt) {
 
-			var
-				key = evt.which || evt.keyCode || 0,
-				charCode = evt.charCode || 0,
-				hidePopup = true
-			;
+				var
+					key = evt.which || evt.keyCode || 0,
+					charCode = evt.charCode || 0,
+					hidePopup = true
+				;
 
-			if ( ( charCode == 40 || charCode == 41 ) && evt.shiftKey ) {
-				_this.handleBrackets(evt, (charCode == 40));
-			} else {
-				if (_this.entityPopup) _this.processPopupKeys(evt);
-			}
+				if ( ( charCode == 40 || charCode == 41 ) && evt.shiftKey ) {
+					_this.handleBrackets(evt, (charCode == 40));
+				} else {
+					if (_this.entityPopup) _this.processPopupKeys(evt);
+				}
 
-			_this.fixCaretPosition(evt);
+				_this.fixCaretPosition(evt);
 
-		});
+			});
+		}
 
 		this.quill.root.addEventListener('keydown', function(evt) {
 			var
 				key = evt.which || evt.keyCode || 0
 			;
-
-			if (key == 8 || key == 46) {
-				_this.handleDelete(evt, key);
-			}
 
 			if (_this.entityPopup) _this.processPopupKeys(evt);
 
@@ -312,33 +314,6 @@ class Entities extends Module {
 		return true;
 	}
 
-	handleDelete(evt, key) {
-
-		var range = this.getRange();
-
-		if (range.index === null)
-			return;
-
-		if (key == 8) { // BACKSPACE handling
-			var format = this.quill.getFormat(range.index-1, 1);
-
-			if (format.objectnode || format.objectlink) {
-
-				var len = (format.objectnode)? format.objectnode.length : format.objectlink.length;
-
-				this.quill.deleteText(range.index-1, 1, Emitter.sources.USER);
-				this.quill.selection.setRange(new Range(range.index - len, 0));
-
-				evt.preventDefault();
-				evt.stopPropagation();
-			}
-		}
-
-		if (key == 46) { // DEL handling
-			// working as intended???
-		}
-	}
-
 	createEntityNode(position, data) {
 
 		var
@@ -453,11 +428,11 @@ class Entities extends Module {
 
 		this.openedPopup = popup;
 
-		x = target.offsetLeft + xOffset;
-		y = target.offsetTop + target.offsetHeight - yOffset;
+		var nodeRect = target.getBoundingClientRect();
+		var contRect = this.quill.root.getBoundingClientRect();
 
-		popup.style.left = x + 'px';
-		popup.style.top = y + 'px';
+		popup.style.left = (nodeRect.left - contRect.left + 35) + 'px';
+		popup.style.top = (nodeRect.bottom - contRect.top + 40) + 'px';
 
 		var saveButton = popup.querySelector('[action="save"]');
 		var removeButton = popup.querySelector('[action="remove"]');
