@@ -202,7 +202,7 @@ function addControls(container, groups) {
           let format = control.alias || Object.keys(control)[0];
           let value = control[format];
           if (Array.isArray(value)) {
-            addSelect(group, format, value);
+            controlNode = addSelect(group, format, value);
           } else {
             controlNode = addButton(group, format, value);
           }
@@ -227,6 +227,7 @@ function addSelect(container, format, values) {
     input.appendChild(option);
   });
   container.appendChild(input);
+  return input;
 }
 
 Toolbar.DEFAULTS = {

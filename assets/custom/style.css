@@ -4,6 +4,12 @@
 	font-weight: normal;
 	font-style: normal;
 }
+@font-face {
+	font-family: 'EditorFont';
+	src: url('../fonts/editorFont.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
 
 .i-bold:before
 {
@@ -18,6 +24,16 @@
 .i-underline:before
 {
 	content: "\f0cd";
+}
+
+.i-underline:before
+{
+	content: "\f0cd";
+}
+
+.i-strike:before
+{
+	content: "\f0cc";
 }
 
 .i-list[type='unordered']:before
@@ -52,7 +68,7 @@
 	content: "\f03e";
 }
 
-.i-link:before {
+.i-link:before, .i-linkstyle:before {
 	content: "\f0c1";
 }
 
@@ -71,6 +87,17 @@
 .i-fullscreen:before {
 	content: "\f0b2";
 }
+
+.i-baloon:before {
+	content: "\f27b";
+}
+
+.i-clean:before {
+	content: "\f12d";
+}
+
+
+
 
 /* Editor classes */
 

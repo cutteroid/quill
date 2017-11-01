@@ -134,12 +134,12 @@ module.exports = function(env) {
     }
   };
 
-  if (env && env.dev) {
-    config.module.rules = config.module.rules.slice(1);   // Remove linter
-    config.module.rules[3].use[0].options = {
-      plugins: ['transform-es2015-modules-commonjs']
-    };
-  }
+  // if (env && env.dev) {
+  //   config.module.rules = config.module.rules.slice(1);   // Remove linter
+  //   config.module.rules[3].use[0].options = {
+  //     plugins: ['transform-es2015-modules-commonjs']
+  //   };
+  // }
 
   if (env && env.minimize) {
     config.entry = {
