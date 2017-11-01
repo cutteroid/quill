@@ -5,6 +5,7 @@ const TOOLBAR_CONFIG = [
   [ 'bold', 'italic', 'strike' ],
   [ { script: 'sub' }, { script: 'sup' } ],
   [ 'linkstyle' ],
+  { "controls": [ { "alias": "clean", "title": "Remove all formatting in selected region" } ] },
   { "controls": [ { "alias": "baloon", "customHandler": true, "title": "Show original text preview" } ], "class": "rFloat" }
 ];
 

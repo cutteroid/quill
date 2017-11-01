@@ -194,20 +194,20 @@ function addControls(container, groups) {
       if (typeof control === 'string') {
         addButton(group, control);
       } else {
-
+        var controlNode;
         if (control.customHandler) {
-          var button = addButton(group, control.alias);
-          button.customUpdate = true;
-          if (control.title) button.setAttribute("title", control.title);
+          controlNode = addButton(group, control.alias);
+          controlNode.customUpdate = true;
         } else {
-          let format = Object.keys(control)[0];
+          let format = control.alias || Object.keys(control)[0];
           let value = control[format];
           if (Array.isArray(value)) {
             addSelect(group, format, value);
           } else {
-            addButton(group, format, value);
+            controlNode = addButton(group, format, value);
           }
         }
+        if (control.title) controlNode.setAttribute("title", control.title);
       }
     });
     container.appendChild(group);
