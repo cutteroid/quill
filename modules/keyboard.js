@@ -251,9 +251,11 @@ Keyboard.DEFAULTS = {
       key: ' ',
       collapsed: true,
       format: { list: false },
-      prefix: /^\s*?(1\.|-|\[ ?\]|\[x\])$/,
+      prefix: /^\s*?(\d+\.|-|\[ ?\]|\[x\])$/,
       handler: function(range, context) {
         let length = context.prefix.length;
+        let [line, offset] = this.quill.getLine(range.index);
+        if (offset > length) return true;
         let value;
         switch (context.prefix.trim()) {
           case '[]': case '[ ]':
@@ -270,10 +272,9 @@ Keyboard.DEFAULTS = {
         }
         this.quill.insertText(range.index, ' ', Quill.sources.USER);
         this.quill.history.cutoff();
-        let [line, offset] = this.quill.getLine(range.index + 1);
-        let delta = new Delta().retain(range.index + 1 - offset)
+        let delta = new Delta().retain(range.index - offset)
                                .delete(length + 1)
-                               .retain(line.length() - 1 - offset)
+                               .retain(line.length() - 2 - offset)
                                .retain(1, { list: value });
         this.quill.updateContents(delta, Quill.sources.USER);
         this.quill.history.cutoff();
