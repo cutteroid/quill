@@ -32,6 +32,7 @@ class Toolbar extends Module {
       this.attach(input);
     });
     this.quill.on(Quill.events.EDITOR_CHANGE, (type, range) => {
+      console.debug(type, range);
       if (type === Quill.events.SELECTION_CHANGE) {
         this.update(range);
       }
@@ -109,6 +110,7 @@ class Toolbar extends Module {
     let images = this.quill.images;
     let body = this.quill.root.ownerDocument.body;
     let formats = range == null ? {} : this.quill.getFormat(range);
+    console.debug("UPDATE", range, formats);
     this.controls.forEach(function(pair) {
       let [format, input] = pair;
       if (input.customUpdate) return;

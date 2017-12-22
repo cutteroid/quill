@@ -322,6 +322,7 @@ class Selection {
     if (this.lastRange != null) {
       this.savedRange = this.lastRange;
     }
+    window.console.debug("SELECTION UPDATE", oldRange, lastRange);
     if (!equal(oldRange, this.lastRange)) {
       if (!this.composing && nativeRange != null && nativeRange.native.collapsed && nativeRange.start.node !== this.cursor.textNode) {
         this.cursor.restore();
