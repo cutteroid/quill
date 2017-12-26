@@ -3,25 +3,45 @@ import logger from './logger';
 
 let debug = logger('quill:events');
 
-const EVENTS = ['selectionchange', 'mousedown', 'mouseup', 'click'];
+// const EVENTS = ['selectionchange', 'mousedown', 'mouseup', 'click'];
 
-EVENTS.forEach(function(eventName) {
-  document.addEventListener(eventName, (...args) => {
-    [].slice.call(document.querySelectorAll('.editorContainer')).forEach((node) => {
-      // TODO use WeakMap
-      if (node.__quill && node.__quill.emitter) {
-        node.__quill.emitter.handleDOM(...args);
-      }
-    });
+// EVENTS.forEach(function(eventName) {
+//   document.addEventListener(eventName, (...args) => {
+//     [].slice.call(document.querySelectorAll('.editorContainer')).forEach((node) => {
+//       // TODO use WeakMap
+//       if (node.__quill && node.__quill.emitter) {
+//         node.__quill.emitter.handleDOM(...args);
+//       }
+//     });
+//   });
+// });
+
+//Z event conflict fix
+document.addEventListener("selectionchange", (...args) => {
+  [].slice.call(document.querySelectorAll('.editorContainer')).forEach((node) => {
+    // TODO use WeakMap
+    if (node.__quill && node.__quill.emitter) {
+      node.__quill.emitter.handleDOM(...args);
+    }
   });
 });
-
 
 class Emitter extends EventEmitter {
   constructor() {
     super();
     this.listeners = {};
     this.on('error', debug.error);
+
+    //Z event conflict fix
+    [].slice.call(document.querySelectorAll('.editorContainer')).forEach((node) => {
+      ['mousedown', 'mouseup', 'click'].forEach(function(eventName) {
+        node.addEventListener(eventName, (...args) => {
+          if (node.__quill && node.__quill.emitter) {
+            node.__quill.emitter.handleDOM(...args);
+          }
+        });
+      });
+    });
   }
 
   emit() {
