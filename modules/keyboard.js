@@ -204,33 +204,33 @@ Keyboard.DEFAULTS = {
         this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
       }
     },
-    'list empty enter': {
-      key: Keyboard.keys.ENTER,
-      collapsed: true,
-      format: ['list'],
-      empty: true,
-      handler: function(range, context) {
-        this.quill.format('list', false, Quill.sources.USER);
-        if (context.format.indent) {
-          this.quill.format('indent', false, Quill.sources.USER);
-        }
-      }
-    },
-    'checklist enter': {
-      key: Keyboard.keys.ENTER,
-      collapsed: true,
-      format: { list: 'checked' },
-      handler: function(range) {
-        let [line, offset] = this.quill.getLine(range.index);
-        let delta = new Delta().retain(range.index)
-                               .insert('\n', { list: 'checked' })
-                               .retain(line.length() - offset - 1)
-                               .retain(1, { list: 'unchecked' });
-        this.quill.updateContents(delta, Quill.sources.USER);
-        this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        this.quill.scrollIntoView();
-      }
-    },
+    // 'list empty enter': {
+    //   key: Keyboard.keys.ENTER,
+    //   collapsed: true,
+    //   format: ['list'],
+    //   empty: true,
+    //   handler: function(range, context) {
+    //     this.quill.format('list', false, Quill.sources.USER);
+    //     if (context.format.indent) {
+    //       this.quill.format('indent', false, Quill.sources.USER);
+    //     }
+    //   }
+    // },
+    // 'checklist enter': {
+    //   key: Keyboard.keys.ENTER,
+    //   collapsed: true,
+    //   format: { list: 'checked' },
+    //   handler: function(range) {
+    //     let [line, offset] = this.quill.getLine(range.index);
+    //     let delta = new Delta().retain(range.index)
+    //                            .insert('\n', { list: 'checked' })
+    //                            .retain(line.length() - offset - 1)
+    //                            .retain(1, { list: 'unchecked' });
+    //     this.quill.updateContents(delta, Quill.sources.USER);
+    //     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+    //     this.quill.scrollIntoView();
+    //   }
+    // },
     'header enter': {
       key: Keyboard.keys.ENTER,
       collapsed: true,
@@ -247,40 +247,40 @@ Keyboard.DEFAULTS = {
         this.quill.scrollIntoView();
       }
     },
-    'list autofill': {
-      key: ' ',
-      collapsed: true,
-      format: { list: false },
-      prefix: /^\s*?(\d+\.|-|\*|\[ ?\]|\[x\])$/,
-      handler: function(range, context) {
-        let length = context.prefix.length;
-        let [line, offset] = this.quill.getLine(range.index);
-        if (offset > length) return true;
-        let value;
-        switch (context.prefix.trim()) {
-          case '[]': case '[ ]':
-            value = 'unchecked';
-            break;
-          case '[x]':
-            value = 'checked';
-            break;
-          case '-': case '*':
-            value = 'bullet';
-            break;
-          default:
-            value = 'ordered';
-        }
-        this.quill.insertText(range.index, ' ', Quill.sources.USER);
-        this.quill.history.cutoff();
-        let delta = new Delta().retain(range.index - offset)
-                               .delete(length + 1)
-                               .retain(line.length() - 2 - offset)
-                               .retain(1, { list: value });
-        this.quill.updateContents(delta, Quill.sources.USER);
-        this.quill.history.cutoff();
-        this.quill.setSelection(range.index - length, Quill.sources.SILENT);
-      }
-    },
+    // 'list autofill': {
+    //   key: ' ',
+    //   collapsed: true,
+    //   format: { list: false },
+    //   prefix: /^\s*?(\d+\.|-|\*|\[ ?\]|\[x\])$/,
+    //   handler: function(range, context) {
+    //     let length = context.prefix.length;
+    //     let [line, offset] = this.quill.getLine(range.index);
+    //     if (offset > length) return true;
+    //     let value;
+    //     switch (context.prefix.trim()) {
+    //       case '[]': case '[ ]':
+    //         value = 'unchecked';
+    //         break;
+    //       case '[x]':
+    //         value = 'checked';
+    //         break;
+    //       case '-': case '*':
+    //         value = 'bullet';
+    //         break;
+    //       default:
+    //         value = 'ordered';
+    //     }
+    //     this.quill.insertText(range.index, ' ', Quill.sources.USER);
+    //     this.quill.history.cutoff();
+    //     let delta = new Delta().retain(range.index - offset)
+    //                            .delete(length + 1)
+    //                            .retain(line.length() - 2 - offset)
+    //                            .retain(1, { list: value });
+    //     this.quill.updateContents(delta, Quill.sources.USER);
+    //     this.quill.history.cutoff();
+    //     this.quill.setSelection(range.index - length, Quill.sources.SILENT);
+    //   }
+    // },
     'code exit': {
       key: Keyboard.keys.ENTER,
       collapsed: true,
