@@ -4,7 +4,6 @@ import extend from 'extend';
 import Delta from 'quill-delta';
 import DeltaOp from 'quill-delta/lib/op';
 import Parchment from 'parchment';
-import Embed from '../blots/embed';
 import Quill from '../core/quill';
 import logger from '../core/logger';
 import Module from '../core/module';
@@ -204,6 +203,7 @@ Keyboard.DEFAULTS = {
         this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
       }
     },
+
     // 'list empty enter': {
     //   key: Keyboard.keys.ENTER,
     //   collapsed: true,
@@ -222,8 +222,9 @@ Keyboard.DEFAULTS = {
     //   format: { list: 'checked' },
     //   handler: function(range) {
     //     let [line, offset] = this.quill.getLine(range.index);
+    //     let formats = extend({}, line.formats(), { list: 'checked' });
     //     let delta = new Delta().retain(range.index)
-    //                            .insert('\n', { list: 'checked' })
+    //                            .insert('\n', formats)
     //                            .retain(line.length() - offset - 1)
     //                            .retain(1, { list: 'unchecked' });
     //     this.quill.updateContents(delta, Quill.sources.USER);
@@ -231,6 +232,7 @@ Keyboard.DEFAULTS = {
     //     this.quill.scrollIntoView();
     //   }
     // },
+
     'header enter': {
       key: Keyboard.keys.ENTER,
       collapsed: true,
@@ -308,6 +310,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
   return {
     key,
     shiftKey,
+    altKey: null,
     [where]: /^$/,
     handler: function(range) {
       let index = range.index;
@@ -315,7 +318,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
         index += (range.length + 1);
       }
       const [leaf, ] = this.quill.getLeaf(index);
-      if (!(leaf instanceof Embed)) return true;
+      if (!(leaf instanceof Parchment.Embed)) return true;
       if (key === Keyboard.keys.LEFT) {
         if (shiftKey) {
           this.quill.setSelection(range.index - 1, range.length + 1, Quill.sources.USER);

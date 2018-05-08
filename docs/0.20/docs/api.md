@@ -1,7 +1,7 @@
 ---
 layout: v0.20
 permalink: /0.20/docs/api/
-title: API - Quill
+title: API - Quill v0.20
 ---
 <div class="container">
   <div id="sidebar-dropdown">
@@ -635,7 +635,7 @@ title: API - Quill
 "nx">insertEmbed</span><span class="p">(</span><span class=
 "mi">10</span><span class="p">,</span> <span class=
 "s1">'image'</span><span class="p">,</span> <span class=
-"s1">'http://quilljs.com/images/cloud.png'</span><span class=
+"s1">'https://quilljs.com/images/cloud.png'</span><span class=
 "p">);</span></code>
 </pre>
       </figure>
@@ -1340,7 +1340,5 @@ title: API - Quill
     </div>
   </div>
 </div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" type=
-"text/javascript"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"
-type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
