@@ -1,7 +1,7 @@
 ---
 layout: v0.20
 permalink: /0.20/
-title: Quill - A Rich Text WYSIWYG Editor with an API
+title: A Rich Text WYSIWYG Editor with an API - Quill v0.20
 ---
 <div id="demo-container">
   <div class="quill-wrapper" data-toggle="tooltip" data-placement="left" title="Try me out!">
@@ -130,9 +130,9 @@ title: Quill - A Rich Text WYSIWYG Editor with an API
         <span>Quill is a free, </span>
         <a href="https://github.com/quilljs/quill/">open source</a>
         <span> WYSIWYG editor built for the modern web. With its </span>
-        <a href="http://quilljs.com/0.20/docs/modules/">extensible architecture</a>
+        <a href="https://quilljs.com/0.20/docs/modules/">extensible architecture</a>
         <span> and a </span>
-        <a href="http://quilljs.com/0.20/docs/api/">expressive API</a>
+        <a href="https://quilljs.com/0.20/docs/api/">expressive API</a>
         <span> you can completely customize it to fulfill your needs. Some built in features include:</span>
       </div>
       <div><br /></div>
@@ -186,7 +186,7 @@ title: Quill - A Rich Text WYSIWYG Editor with an API
         </a>
       </div>
       <div class="col-sm-2">
-        <a href="http://www.intuit.com/" title="Intuit" target="_blank">
+        <a href="https://www.intuit.com/" title="Intuit" target="_blank">
           <img class="img-responsive" src="/0.20/assets/images/users/intuit.png" alt="Intuit" />
         </a>
       </div>
@@ -210,7 +210,7 @@ title: Quill - A Rich Text WYSIWYG Editor with an API
     <a href="https://github.com/quilljs/quill/releases/download/v0.20.1/quill.tar.gz" class="btn-lg btn" title="Quill v0.20.1" onclick="ga('send','event','download',this.href);">Download Quill</a>
   </div>
 </div>
-<script type="text/javascript" src="//cdn.quilljs.com/0.20.1/quill.js"></script>
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/0.20/assets/js/index.js"></script>
+<script src="//cdn.quilljs.com/0.20.1/quill.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="/0.20/assets/js/index.js"></script>

@@ -79,7 +79,7 @@ insertEmbed(index: Number, type: String, value: any, source: String = 'api'): De
 **Examples**
 
 ```javascript
-quill.insertEmbed(10, 'image', 'http://quilljs.com/images/cloud.png');
+quill.insertEmbed(10, 'image', 'https://quilljs.com/images/cloud.png');
 ```
 
 ### insertText
@@ -106,12 +106,6 @@ quill.insertText(5, 'Quill', {
   'italic': true
 });
 ```
-
-### pasteHTML
-
-***Deprecated***
-
-This API has been moved into [Clipboard](/docs/modules/clipboard/#dangerouslypastehtml) and renamed. It will be removed as a top level API in 2.0.
 
 ### setContents
 
@@ -168,7 +162,7 @@ quill.updateContents(new Delta()
   .delete(5)                  // 'World' is deleted
   .insert('Quill')
   .retain(1, { bold: true })  // Apply bold to exclamation mark
-});
+);
 // Editor should now be [
 //  { insert: 'Hello Quill' },
 //  { insert: '!', attributes: { bold: true} }
