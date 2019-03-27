@@ -70,31 +70,42 @@ class ObjectNode extends Immutable {
 		return data;
 	}
 
-	// unwrap(domNode) {
-	// 	var
-	// 		node = this.domNode,
-	// 		parent = this.parent.domNode
-	// 	;
-	// 	while (node.firstChild) parent.insertBefore(node.firstChild, node);
-	// 		parent.removeChild(node);
-	// 	this.remove();
-	// }
+	unwrap(domNode) {
+		var
+			node = this.domNode,
+			text = node.innerText,
+			parent = this.parent.domNode
+		;
 
-	// length() {
-	// 	return this._length;
-	// }
+		this.leftGuard.parentNode.removeChild(this.leftGuard);
+		this.rightGuard.parentNode.removeChild(this.rightGuard);
 
-	// refreshData(data) {
-	// 	if (data.index) {
-	// 		this.domNode.setAttribute('index', data.index);
-	// 	}
-	// 	else {
-	// 		this.domNode.removeAttribute('index');
-	// 	}
+		var textNode = document.createTextNode(node.innerText.replace('\uFEFF', ''));
 
-	// 	this.domNode.setAttribute('type', data.type);
-	// 	this.domNode.setAttribute('icon', data.type);
-	// }
+		parent.insertBefore(textNode, node);
+		parent.removeChild(node);
+
+		this.remove();
+	}
+
+	refreshData(data) {
+		if (data.index) {
+			this.contentNode.setAttribute('index', data.index);
+		}
+		else {
+			this.contentNode.removeAttribute('index');
+		}
+
+		if (data.type) {
+			this.domNode.setAttribute('data-type', data.type);
+			this.contentNode.setAttribute('type', data.type);
+			this.contentNode.setAttribute('icon', data.type);
+		} else {
+			this.domNode.removeAttribute('data-type');
+			this.contentNode.removeAttribute('type');
+			this.contentNode.removeAttribute('icon');
+		}
+	}
 
 }
 

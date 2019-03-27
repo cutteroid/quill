@@ -135,7 +135,7 @@ class Toolbar extends Module {
         if (range == null) {
           input.classList.remove('active');
           if (images && images.openedPanel != null) {
-            images.closeImagePanel();
+            // images.closeImagePanel();
           }
         } else if (input.hasAttribute('type')) {
           // both being null should match (default values)

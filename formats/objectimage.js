@@ -47,6 +47,14 @@ class ObjectImage extends Immutable {
 		return format;
 	}
 
+	unwrap(domNode) {
+
+		this.leftGuard.parentNode.removeChild(this.leftGuard);
+		this.rightGuard.parentNode.removeChild(this.rightGuard);
+
+		this.remove();
+	}
+
 	length() { return 1; }
 
 }
