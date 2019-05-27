@@ -26,6 +26,8 @@ const source = [
   'test',
   'themes',
   'ui',
+  'irst.js',
+  'rhea.js'
 ].map(file => {
   return path.resolve(__dirname, '..', file);
 });
@@ -106,6 +108,9 @@ const baseConfig = {
     'quill.bubble': './assets/bubble.styl',
     'quill.snow': './assets/snow.styl',
     'unit.js': './test/unit.js',
+    'quill.irst.js': ['./irst.js'],
+    'quill.rhea.js': ['./rhea.js']
+
   },
   output: {
     filename: '[name]',

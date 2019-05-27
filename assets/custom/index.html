@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<link rel="stylesheet" href="style.css" />
+
+	<script type="text/javascript" src="http://localhost:9080/quill.irst.js"></script>
+	<!-- <script type="text/javascript" src="http://192.168.154.1:8080/js/main.js"></script> -->
+	<!-- <script src="/1.3.3/quill.rhea.js"></script> -->
+
+	<style>
+		#snow-container {
+			height: 350px;
+		}
+		.standalone-container {
+			margin: 50px auto;
+			width: 720px;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div class="standalone-container tabContent">
+		<div id="snow-container">
+			<ol>
+				<li>one</li>
+				<li>
+					foo <b>two</b> bar ddd
+					<ul>
+						<li>unordered</li>
+						<li>unordered</li>
+					</ul>
+				</li>
+				<li>three</li>
+			</ol>
+		</div>
+	</div>
+
+	<!-- <script type="text/javascript" src="/1.0.0-rc.2/quill.custom.js"></script> -->
+
+	<script>
+		var snowQuill = new Quill('#snow-container', {
+			placeholder: 'Compose an epic...',
+			theme: 'snow'
+		});
+	</script>
+
+</body>
+</html>

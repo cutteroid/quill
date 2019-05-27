@@ -5,12 +5,7 @@ import LinkBlot from '../formats/link';
 import { Range } from '../core/selection';
 import icons from '../ui/icons';
 
-const TOOLBAR_CONFIG = [
-  [{ header: ['1', '2', '3', false] }],
-  ['bold', 'italic', 'underline', 'link'],
-  [{ list: 'ordered' }, { list: 'bullet' }],
-  ['clean'],
-];
+const TOOLBAR_CONFIG = [];
 
 class SnowTooltip extends BaseTooltip {
   constructor(quill, bounds) {
