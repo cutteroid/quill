@@ -105,6 +105,10 @@ class ObjectNode extends Immutable {
 			this.contentNode.removeAttribute('type');
 			this.contentNode.removeAttribute('icon');
 		}
+
+		if (data.text) {
+			this.contentNode.innerText = data.text;
+		}
 	}
 
 }
