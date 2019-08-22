@@ -329,6 +329,8 @@ class Entities extends Module {
 		if (data.type) entityData.type = data.type;
 		if (data.index) entityData.index = data.index;
 
+		data.uid = uid;
+
 		entityData.blotType = 'objectnode';
 		this.createDomNode(position, entityData);
 	}

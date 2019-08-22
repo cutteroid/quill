@@ -36,8 +36,14 @@ import ObjectImage from './formats/objectimage';
 
 import Filler from './formats/filler';
 import DropZone from './formats/dropzone';
+import MarkText from './formats/marktext';
+import LinkStyle from './formats/linkstyle';
 
 import CleanPaste from './modules/cleanpaste';
+
+import Blockquote from './formats/blockquote';
+import Header from './formats/header';
+import CodeBlock, { Code as InlineCode } from './formats/code';
 
 Quill.register({
 
@@ -49,7 +55,13 @@ Quill.register({
   'formats/strike': Strike,
   'formats/underline': Underline,
 
-  'formats/list/item': ListItem,
+  'formats/list/item' : ListItem,
+
+  'formats/blockquote': Blockquote,
+  'formats/code-block': CodeBlock,
+  'formats/header'    : Header,
+  'formats/marktext' : MarkText,
+  'formats/linkstyle': LinkStyle,
 
   'blots/block'        : Block,
   'blots/block/embed'  : BlockEmbed,
